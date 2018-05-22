@@ -1,0 +1,32 @@
+{
+  "name": "norest-kyc-be",
+  "version": "1.0.0",
+  "description": "norest kyc backend",
+  "main": "app.js",
+  "scripts": {
+    "start": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gedanziger/norest-kyc-be.git"
+  },
+  "keywords": [
+    "kyc",
+    "docker",
+    "nodejs",
+    "mongdb"
+  ],
+  "author": "Oleg Baturov",
+  "private": true,
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gedanziger/norest-kyc-be/issues"
+  },
+  "homepage": "https://github.com/gedanziger/norest-kyc-be#readme",
+  "dependencies": {
+    "express": "^4.16.3",
+    "mongoose": "^5.1.2",
+    "nodemon": "^1.17.4"
+  }
+}
