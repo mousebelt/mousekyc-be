@@ -25,8 +25,13 @@
   },
   "homepage": "https://github.com/gedanziger/norest-kyc-be#readme",
   "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
+    "cookie-parser": "^1.4.3",
+    "cors": "^2.8.4",
     "express": "^4.16.3",
     "mongoose": "^5.1.2",
-    "nodemon": "^1.17.4"
+    "nocache": "^2.0.0",
+    "nodemon": "^1.17.4",
+    "socket.io": "^2.1.1"
   }
 }
