@@ -29,6 +29,8 @@
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
     "express": "^4.16.3",
+    "express-fileupload": "^0.4.0",
+    "gridfs-stream": "^1.1.1",
     "mongoose": "^5.1.2",
     "nocache": "^2.0.0",
     "nodemon": "^1.17.4",
