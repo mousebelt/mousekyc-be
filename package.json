@@ -4,8 +4,8 @@
   "description": "norest kyc backend",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon server/app.js",
+    "test": "NODE_ENV=test mocha --reporter spec test/**/*.js"
   },
   "repository": {
     "type": "git",
@@ -26,14 +26,18 @@
   "homepage": "https://github.com/gedanziger/norest-kyc-be#readme",
   "dependencies": {
     "bcrypt-nodejs": "0.0.3",
+    "chai": "^4.1.2",
+    "chai-http": "^4.0.0",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
     "express": "^4.16.3",
     "express-fileupload": "^0.4.0",
     "gridfs-stream": "^1.1.1",
+    "mocha": "^5.2.0",
     "mongoose": "^5.1.2",
     "nocache": "^2.0.0",
     "nodemon": "^1.17.4",
+    "request": "^2.87.0",
     "socket.io": "^2.1.1"
   }
 }
