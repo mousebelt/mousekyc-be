@@ -80,3 +80,5 @@ function connect() {
 server.listen(port, function() {
   console.log("Server listening at port %d", port);
 });
+
+module.exports = server

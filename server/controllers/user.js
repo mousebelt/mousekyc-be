@@ -72,11 +72,11 @@ exports.postAdd = async (req, res) => {
         var writestream = gfs.createWriteStream({ filename });
         fs
           .createReadStream(filepath)
-          .on("end", function() {
-            fs.unlink(filepath, function(err) {
-              if (err) console.log("unlink error: ", err);
-            });
-          })
+          // .on("end", function() {
+          //   fs.unlink(filepath, function(err) {
+          //     if (err) console.log("unlink error: ", err);
+          //   });
+          // })
           .pipe(writestream);
         identityDocumentDbFile = filename;
       }
@@ -99,11 +99,11 @@ exports.postAdd = async (req, res) => {
         writestream = gfs.createWriteStream({ filename });
         fs
           .createReadStream(filepath)
-          .on("end", function() {
-            fs.unlink(filepath, function(err) {
-              if (err) console.log("unlink error: ", err);
-            });
-          })
+          // .on("end", function() {
+          //   fs.unlink(filepath, function(err) {
+          //     if (err) console.log("unlink error: ", err);
+          //   });
+          // })
           .pipe(writestream);
         selfieDbFile = filename;
       }
@@ -182,16 +182,17 @@ exports.postUpdate = async (req, res) => {
         ];
       var filepath = "./uploads/" + filename;
       var err = await identityDocument.mv(filepath);
+
       if (!err && fs.existsSync(filepath)) {
         try {
           var writestream = gfs.createWriteStream({ filename });
           fs
             .createReadStream(filepath)
-            .on("end", function() {
-              fs.unlink(filepath, function(err) {
-                if (err) console.log("unlink error: ", err);
-              });
-            })
+            // .on("end", function() {
+            //   fs.unlink(filepath, function(err) {
+            //     if (err) console.log("unlink error: ", err);
+            //   });
+            // })
             .pipe(writestream);
           identityDocumentDbFile = filename;
         } catch (error) {}
@@ -209,16 +210,17 @@ exports.postUpdate = async (req, res) => {
         selfie.name.split(".")[selfie.name.split(".").length - 1];
       var filepath = "./uploads/" + filename;
       var err = await selfie.mv(filepath);
+
       if (!err && fs.existsSync(filepath)) {
         try {
           var writestream = gfs.createWriteStream({ filename });
           fs
             .createReadStream(filepath)
-            .on("end", function() {
-              fs.unlink(filepath, function(err) {
-                if (err) console.log("unlink error: ", err);
-              });
-            })
+            // .on("end", function() {
+            //   fs.unlink(filepath, function(err) {
+            //     if (err) console.log("unlink error: ", err);
+            //   });
+            // })
             .pipe(writestream);
           selfieDbFile = filename;
         } catch (error) {}
