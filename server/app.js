@@ -8,6 +8,7 @@ const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
 const nocache = require("nocache");
 const http = require("http");
+const passport = require('passport');
 var Grid = require("gridfs-stream");
 Grid.mongo = mongoose.mongo;
 
@@ -52,6 +53,10 @@ app.use(
 );
 app.use(fileUpload());
 app.use(nocache());
+
+// passport init
+app.use(passport.initialize());
+app.use(passport.session());
 
 // routing
 const Router = require("./routes/app");
