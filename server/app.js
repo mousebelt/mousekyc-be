@@ -8,6 +8,7 @@ const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
 const nocache = require("nocache");
 const http = require("http");
+const passport = require('passport');
 var Grid = require("gridfs-stream");
 Grid.mongo = mongoose.mongo;
 
@@ -20,7 +21,7 @@ const port = process.env.PORT || config.port;
 var server = require("http").createServer(app);
 
 // connect mongodb
-// connect();
+connect();
 mongoose
   .connect(config.db /* { server: { socketOptions: { keepAlive: 1 } } } */)
   .then(conn => {
@@ -52,6 +53,10 @@ app.use(
 );
 app.use(fileUpload());
 app.use(nocache());
+
+// passport init
+app.use(passport.initialize());
+app.use(passport.session());
 
 // routing
 const Router = require("./routes/app");
