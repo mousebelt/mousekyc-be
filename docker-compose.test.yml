@@ -3,7 +3,7 @@ services:
   web-test:
     build:
       context: .
-      dockerfile: Dockerfile-test
+      dockerfile: test.Dockerfile
     volumes:
       - ./:/app
     ports:
