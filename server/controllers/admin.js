@@ -4,9 +4,13 @@ const nodemailer = require("nodemailer");
 const passport = require("passport");
 const fs = require("fs");
 
+const config = require('../config');
+
 const AdminModel = require("../models/admin");
 const AuthModule = require("../modules/auth");
 const UtilsModule = require("../modules/utils");
+
+const MailService = require('../services/mail.service');
 
 /**
  * POST /signup
@@ -14,7 +18,6 @@ const UtilsModule = require("../modules/utils");
  */
 exports.postSignup = (req, res, next) => {
   let { email, password } = req.body;
-  const config = req.app.get("config");
 
   // validation
   if (!UtilsModule.validateEmail(email))
@@ -45,25 +48,12 @@ exports.postSignup = (req, res, next) => {
       let token = "";
       crypto.randomBytes(8, (err, buf) => {
         token = buf.toString("hex");
-        const transporter = nodemailer.createTransport({
-          service: "SendGrid",
-          auth: {
-            user: config.sendgrid.USER,
-            pass: config.sendgrid.PASS
-          }
+
+        MailService.send(config.email.from.general, user.email, "Thanks for your registeration", `Welcome.\n\nYou are receiving this because you sign up.\n\n`)
+        .then(() => { })
+        .catch(error => {
+          console.log("Error occur while sending email");
         });
-        const mailOptions = {
-          to: user.email,
-          from: "hello@norestlabs.com",
-          subject: "Thanks for your registeration",
-          text: `Welcome.\n\nYou are receiving this because you sign up.\n\n`
-        };
-        return transporter
-          .sendMail(mailOptions)
-          .then(() => { })
-          .catch(error => {
-            console.log("Error occur while sending email");
-          });
       });
 
       return res.json({

@@ -64,9 +64,9 @@ app.use("/", Router);
 
 // io server
 const io = require("socket.io")(server);
-require("./socketservice/socket-server")(io);
+require("./services/socket.service")(io);
 //cron for updating db
-require("./cronservice/cron").start();
+require("./services/cron.service").start();
 
 // initialize image folder for uploading
 (function() {
