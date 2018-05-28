@@ -7,7 +7,7 @@ const MailService = require('../services/mail.service');
 
 exports.getInfoToken = async (req, res) => {
   var token = String(req.params.token);
-
+  
   try {
     var userRow = await UserModel.findOne({ token });
     if (!userRow) return res.json({ status: 400, msg: "Invalid token !" });
@@ -36,7 +36,7 @@ exports.postGenToken = async (req, res) => {
   userRow.set({ token, tokenExpireDate });
   userRow.save();
 
-  res.json({ status: 200, msg: 'success', data: token });
+  res.json({ status: 200, msg: 'success', data: { token, email } });
 }
 
 // exports.postAdd = async (req, res) => {
