@@ -2,12 +2,15 @@
 KYC backend apis : admin, user
 
 ## Summary
+[admin apis](#admin-apis-1)  
+[user apis](#user-apis)  
 ### Admin apis
 [admin signup](#signup)  
 [admin login](#login)  
 [admin approve user](#approve_user)  
 ### User
 [get info from token](#getinfotoken)  
+[generate token from email](#generatetoken)  
 [Update user from token, email](#updateuser)  
 
 ***
