@@ -3,12 +3,11 @@ const router = express.Router();
 const userController = require('../controllers/user');
 
 // get
-router.get('/status/:token', userController.getStatus);
+router.get('/info/:token', userController.getInfoToken);
 
 // post
-router.post('/status', userController.postStatus);
 router.post('/gentoken', userController.postGenToken);
-router.post('/add', userController.postAdd);
+// router.post('/add', userController.postAdd);
 router.post('/update', userController.postUpdate);
 
 module.exports = router

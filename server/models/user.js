@@ -8,6 +8,7 @@ var userSchema = new Schema(
     name: String,
     email: { type: String, unique: true },
     token: String,
+    tokenExpireDate: Date,
   
     phone: String,
     dob: Date,
