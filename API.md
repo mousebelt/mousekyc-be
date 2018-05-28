@@ -8,6 +8,7 @@ KYC backend apis : admin, user
 [admin signup](#signup)  
 [admin login](#login)  
 [admin approve user](#approve_user)  
+[list submissions](#listsubmissions)  
 ### User
 [get info from token](#getinfotoken)  
 [generate token from email](#generatetoken)  
@@ -134,5 +135,23 @@ KYC backend apis : admin, user
  * 
  * @return
  * { "status": 200, "msg": "success", data: userInfo }
+*/
+```
+
+<a name="listsubmissions"/>
+
+- List submissions
+```
+/**
+ * @function: List submissions
+ * 
+ * @method: POST /submission_list
+ * 
+ * @param {String|Required} token
+ * @param {Number} offset
+ * @param {Number} count
+ * 
+ * @return
+ * { "status": 200, "msg": "success", data: [submission] }
 */
 ```
