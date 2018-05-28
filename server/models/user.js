@@ -19,9 +19,10 @@ var userSchema = new Schema(
     selfie: String, // photo in blobstore
     approvalStatus: {
       type: String,
-      // enum: ['No Submission Yet', 'Pending Review', 'KYC Complete', 'KYC Error'],
-      default: "No Submission Yet"
+      // enum: ['NO_SUBMISSION_YET', PENDING', 'APPROVED', 'ACTION_REQUESTED', 'BLOCKED'],
+      default: "NO_SUBMISSION_YET"
     },
+    approvalDescription: String, // ex: "Please submit a clearer selfie, identity is not clear from photo"
     adminContact: String,
     checkStatus: String,
     adminMessage: String,
