@@ -5,6 +5,20 @@ var UserModel = require("../models/user");
 var UtilsModule = require("../modules/utils");
 const MailService = require('../services/mail.service');
 
+/**
+ * @function: Get user info from token
+ * 
+ * @method: GET /info/:token
+ * 
+ * @param {String|Required} token
+ * 
+ * @return
+ * { "status": 200, "msg": "success", data: userInfo }
+ * 
+ * userInfo = {
+ *  email, token, approvalStatus, approvalDescriptin
+ * }
+*/
 exports.getInfoToken = async (req, res) => {
   var token = String(req.params.token);
   
@@ -25,6 +39,16 @@ exports.getInfoToken = async (req, res) => {
   }
 }
 
+/**
+ * @function: Generate token for user email
+ * 
+ * @method: POST /gentoken
+ * 
+ * @param {String|Required} email
+ * 
+ * @return
+ * { "status": 200, "msg": "success", data: { token, email } }
+*/
 exports.postGenToken = async (req, res) => {
   var email = String(req.body.email);
   if (!UtilsModule.validateEmail(email)) return res.json({ status: 400, msg: "Invalid email !" });
@@ -180,6 +204,27 @@ exports.postGenToken = async (req, res) => {
 //   }
 // };
 
+/**
+ * @function: Update user from token, email
+ * 
+ * @method: POST /update
+ * 
+ * @param {String|Required} email
+ * @param {String|Required} token
+ * @param {String} name
+ * @param {String} phone
+ * @param {String} dob
+ * @param {String} nationalityCountry
+ * @param {String} residenceCountry
+ * @param {String} residenceAddress
+ * @param {String} adminContact
+ * @param {String} checkStatus
+ * @param {String} adminMessage
+ * @param {String} backgroundCheckId
+ * 
+ * @return
+ * { "status": 200, "msg": "success", data: userInfo }
+*/
 exports.postUpdate = async (req, res) => {
   const gfs = req.app.get("gfs");
   var {

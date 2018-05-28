@@ -14,9 +14,16 @@ const UtilsModule = require("../modules/utils");
 const MailService = require('../services/mail.service');
 
 /**
- * POST /signup
- * Create a new local account.
- */
+ * @function: Admin user signup
+ * 
+ * @method: POST /signup
+ * 
+ * @param {String|Required} email
+ * @param {String|Required} password
+ * 
+ * @return
+ * { "status": 200, "msg": "success" }
+*/
 exports.postSignup = (req, res, next) => {
   let { email, password } = req.body;
 
@@ -66,9 +73,16 @@ exports.postSignup = (req, res, next) => {
 };
 
 /**
- * POST /login
- * Sign in using email and password.
- */
+ * @function: Admin user login
+ * 
+ * @method: POST /login
+ * 
+ * @param {String|Required} email
+ * @param {String|Required} password
+ * 
+ * @return
+ * { "status": 200, "msg": "success", data: { token } }
+*/
 exports.postLogin = (req, res, next) => {
   var { email, password } = req.body;
 
@@ -102,12 +116,20 @@ exports.postLogin = (req, res, next) => {
 };
 
 /**
- * POST /approve_user
- * Set approval status, approval description of user
- */
+ * @function: Set approval status, approval description of user
+ * 
+ * @method: POST /approve_user
+ * 
+ * @param {String|Required} token
+ * @param {String|Required} useremail
+ * @param {String|Required} approvalStatus
+ * @param {String} approvalDescription
+ * 
+ * @return
+ * { "status": 200, "msg": "success", data: userInfo }
+*/
 exports.postApproveUser = async (req, res, next) => {
   var token = req.body.token;
-  // var userid = String(req.body.userid);
   var useremail = req.body.useremail;
   var approvalStatus = req.body.approvalStatus;
   var approvalDescription = req.body.approvalDescription;
@@ -120,7 +142,7 @@ exports.postApproveUser = async (req, res, next) => {
   // logic
   var loggedAdmin = AuthModule.getAdminFromToken(token);
   if (!loggedAdmin) return res.json({status: 400, msg: 'token is not invalid !'});
-console.log({loggedAdmin});
+
   var userRow = await UserModel.findOne({email: useremail});
   if (!userRow) return res.json({status:400, msg: 'user email is not exsiting !'});
 
@@ -128,6 +150,6 @@ console.log({loggedAdmin});
   userRow.approvalDescription = approvalDescription;
   userRow.save(err => {
     if (err) return res.json({status: 400, msg: 'user save error !'});
-    return res.json({status: 200, msg: 'success'})
+    return res.json({status: 200, msg: 'success', data: userRow})
   })
 };
