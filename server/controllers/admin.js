@@ -135,21 +135,55 @@ exports.postApproveUser = async (req, res, next) => {
   var approvalDescription = req.body.approvalDescription;
 
   // validation
-  if (!token || token == '') return res.json({status:400, msg: 'Empty token !'});
-  if (!UtilsModule.validateEmail(useremail)) return res.json({status:400, msg: 'Invalid useremail !'});
-  if (!approvalStatus || approvalStatus == '') return res.json({status:400, msg: 'Empty approvalStatus !'});
+  if (!token || token == '') return res.json({ status: 400, msg: 'Empty token !' });
+  if (!UtilsModule.validateEmail(useremail)) return res.json({ status: 400, msg: 'Invalid useremail !' });
+  if (!approvalStatus || approvalStatus == '') return res.json({ status: 400, msg: 'Empty approvalStatus !' });
 
   // logic
   var loggedAdmin = AuthModule.getAdminFromToken(token);
-  if (!loggedAdmin) return res.json({status: 400, msg: 'token is not invalid !'});
+  if (!loggedAdmin) return res.json({ status: 400, msg: 'token is not invalid !' });
 
-  var userRow = await UserModel.findOne({email: useremail});
-  if (!userRow) return res.json({status:400, msg: 'user email is not exsiting !'});
+  var userRow = await UserModel.findOne({ email: useremail });
+  if (!userRow) return res.json({ status: 400, msg: 'user email is not exsiting !' });
 
   userRow.approvalStatus = approvalStatus;
   userRow.approvalDescription = approvalDescription;
   userRow.save(err => {
-    if (err) return res.json({status: 400, msg: 'user save error !'});
-    return res.json({status: 200, msg: 'success', data: userRow})
+    if (err) return res.json({ status: 400, msg: 'user save error !' });
+    return res.json({ status: 200, msg: 'success', data: userRow })
   })
+};
+
+/**
+ * @function: List submissions
+ * 
+ * @method: POST /submission_list
+ * 
+ * @param {String|Required} token
+ * @param {Number} offset
+ * @param {Number} count
+ * 
+ * @return
+ * { "status": 200, "msg": "success", data: [submission] }
+*/
+exports.postSubmissionList = async (req, res, next) => {
+  var token = req.body.token;
+  var approvalStatus = req.body.approvalStatus;
+  var offset = Number(req.body.offset);
+  var count = Number(req.body.count);
+
+  if (!offset) offset = 0;
+  if (!count) count = 16;
+
+  // validation
+  if (!token || token == '') return res.json({ status: 400, msg: 'Empty token !' });
+
+  // logic
+  var loggedAdmin = AuthModule.getAdminFromToken(token);
+  if (!loggedAdmin) return res.json({ status: 400, msg: 'token is not invalid !' });
+
+  var cond = approvalStatus ? { approvalStatus } : {};
+  var submissions = await UserModel.find(cond).sort({ updatedAt: 1, approvalStatus: -1 }).skip(offset).limit(count);
+
+  return res.json({ status: 200, msg: 'success', data: submissions });
 };
