@@ -6,5 +6,6 @@ const AdminController = require('../controllers/admin')
 // post
 router.post('/signup', AdminController.postSignup)
 router.post('/signin', AdminController.postLogin)
+router.post('/approve_user', AdminController.postApproveUser)
 
 module.exports = router

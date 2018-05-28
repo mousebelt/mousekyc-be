@@ -14,9 +14,10 @@ exports.getInfoToken = async (req, res) => {
 
     return res.json({
       status: 200, msg: "success", data: {
-        approvalStatus: userRow.approvalStatus,
         email: userRow.email,
-        token
+        token,
+        approvalStatus: userRow.approvalStatus,
+        approvalDescription: userRow.approvalDescription,
       }
     });
   } catch (error) {

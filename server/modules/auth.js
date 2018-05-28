@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 const config = require('../config');
-const User = require('../models/admin');
+const AdminModel = require('../models/admin');
 
 /**
  * Make authorization token
@@ -15,18 +15,18 @@ exports.makeLoginToken = (payload, options) => {
  * Get loggedUserInfo
  * @param {request} req 
  */
-exports.getLoggedInUser = async (req) => {
+exports.getLoggedInAdmin = async (req) => {
     const tokenRaw = req.headers['authorization']
-    return await getUserFromToken(tokenRaw)
+    return await getAdminFromToken(tokenRaw)
 }
 
-exports.getUserFromToken = async (tokenRaw) => {
+exports.getAdminFromToken = async (tokenRaw) => {
     try {
-        if (!tokenRaw || tokenRaw == '') throw 'empty token !'
+        if (String(tokenRaw) == '') throw 'empty token !'
         var decoded = (jwt.verify(String(tokenRaw), 'secret'))
         var { _id } = JSON.parse(JSON.stringify(decoded))
-        var user = await User.findById(_id)
-        return user
+        var admin = await AdminModel.findById(_id)
+        return admin
     } catch (e) {
         return undefined
     }
