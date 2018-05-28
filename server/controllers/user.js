@@ -1,6 +1,51 @@
+const cryptoRandomString = require('crypto-random-string');
 const fs = require("fs");
+const config = require('../config');
 var UserModel = require("../models/user");
 var UtilsModule = require("../modules/utils");
+const MailService = require('../services/mail.service');
+
+exports.getStatus = async (req, res) => {
+  var token = String(req.params.token);
+
+  try {
+    var userRow = await UserModel.findOne({ token });
+    if (!userRow) return res.json({ status: 200, msg: "No existing user", data: undefined });
+
+    return res.json({ status: 200, msg: "success", data: userRow.approvalStatus });
+  } catch (error) {
+    return res.json({ status: 400, msg: "User read error !", data: error });
+  }
+}
+
+exports.postStatus = async (req, res) => {
+  var email = String(req.body.email);
+
+  if (!UtilsModule.validateEmail(email)) return res.json({ status: 400, msg: "Invalid email !" });
+
+  try {
+    var userRow = await UserModel.findOne({ email });
+    if (!userRow) return res.json({ status: 200, msg: "No existing user", data: undefined });
+
+    return res.json({ status: 200, msg: "success", data: userRow.approvalStatus });
+  } catch (error) {
+    return res.json({ status: 400, msg: "User read error !", data: error });
+  }
+}
+
+exports.postGenToken = async (req, res) => {
+  var email = String(req.body.email);
+  if (!UtilsModule.validateEmail(email)) return res.json({ status: 400, msg: "Invalid email !" });
+
+  var token = cryptoRandomString(17);
+
+  var userRow = await UserModel.findOne({ email });
+  if (!userRow) userRow = new UserModel({ email });
+  userRow.set({ token });
+  userRow.save();
+
+  res.json({status: 200, msg: 'success', data: token});
+}
 
 exports.postAdd = async (req, res) => {
   const gfs = req.app.get("gfs");
@@ -64,7 +109,7 @@ exports.postAdd = async (req, res) => {
         Date.now() +
         "." +
         identityDocument.name.split(".")[
-          identityDocument.name.split(".").length - 1
+        identityDocument.name.split(".").length - 1
         ];
       var filepath = "./uploads/" + filename;
       var err = await identityDocument.mv(filepath);
@@ -159,7 +204,7 @@ exports.postUpdate = async (req, res) => {
   try {
     identityDocument = req.files.identityDocument;
     selfie = req.files.selfie;
-  } catch (errors) {}
+  } catch (errors) { }
 
   // validation
   if (!UtilsModule.validateEmail(email))
@@ -178,7 +223,7 @@ exports.postUpdate = async (req, res) => {
         Date.now() +
         "." +
         identityDocument.name.split(".")[
-          identityDocument.name.split(".").length - 1
+        identityDocument.name.split(".").length - 1
         ];
       var filepath = "./uploads/" + filename;
       var err = await identityDocument.mv(filepath);
@@ -195,7 +240,7 @@ exports.postUpdate = async (req, res) => {
             // })
             .pipe(writestream);
           identityDocumentDbFile = filename;
-        } catch (error) {}
+        } catch (error) { }
       }
     }
 
@@ -223,7 +268,7 @@ exports.postUpdate = async (req, res) => {
             // })
             .pipe(writestream);
           selfieDbFile = filename;
-        } catch (error) {}
+        } catch (error) { }
       }
     }
 

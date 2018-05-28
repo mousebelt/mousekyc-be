@@ -7,6 +7,8 @@ var userSchema = new Schema(
   {
     name: String,
     email: { type: String, unique: true },
+    token: String,
+  
     phone: String,
     dob: Date,
     nationalityCountry: String, // Country code
@@ -16,8 +18,8 @@ var userSchema = new Schema(
     selfie: String, // photo in blobstore
     approvalStatus: {
       type: String,
-      // enum: ['Pending', 'Reject', 'Passed'],
-      default: "Pending"
+      // enum: ['No Submission Yet', 'Pending Review', 'KYC Complete', 'KYC Error'],
+      default: "No Submission Yet"
     },
     adminContact: String,
     checkStatus: String,
