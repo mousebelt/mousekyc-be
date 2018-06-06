@@ -3,7 +3,7 @@ const router = express.Router()
 const globalController = require('../controllers/global')
 
 // get
-router.get('/coins', globalController.getCoins)
+router.get('/countries', globalController.getCountries)
 
 // post
 
