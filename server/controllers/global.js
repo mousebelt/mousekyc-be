@@ -9,7 +9,6 @@ exports.getCountries = (req, res) => {
     var data = _.map(all, item => {
       return { name: item.name, alpha3: item.ISO.alpha3 };
     });
-    console.log(data);
     return res.json({ status: 200, msg: "success", data });
   } catch (error) {
     return res.json({ status: 400, msg: "DB is not working !", data: error });
