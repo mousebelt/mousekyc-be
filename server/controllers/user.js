@@ -222,6 +222,9 @@ exports.postGenToken = async (req, res) => {
  * @param {String} adminMessage
  * @param {String} backgroundCheckId
  * 
+ * @param {file} identityDocument
+ * @param {file} selfie
+ * 
  * @return
  * { "status": 200, "msg": "success", data: userInfo }
 */
