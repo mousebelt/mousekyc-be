@@ -87,7 +87,7 @@ exports.postGenToken = async (req, res) => {
 //  * @param {String} selfie
  * 
  * @param {String} adminContact
- * @param {String} checkStatus
+//  * @param {String} checkStatus
  * @param {String} adminMessage
  * @param {String} backgroundCheckId
  * 
@@ -112,7 +112,6 @@ exports.postUpdate = async (req, res) => {
     residenceAddress,
     //
     adminContact,
-    checkStatus,
     adminMessage,
     backgroundCheckId
   } = req.body;
