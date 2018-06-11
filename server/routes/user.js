@@ -9,5 +9,7 @@ router.get('/info/:token', userController.getInfoToken);
 router.post('/gentoken', userController.postGenToken);
 // router.post('/add', userController.postAdd);
 router.post('/update', userController.postUpdate);
+router.post('/update/identity', userController.postUpdate);
+router.post('/update/selfie', userController.postUpdate);
 
 module.exports = router

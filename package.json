@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/gedanziger/norest-kyc-be#readme",
   "dependencies": {
+    "base64-img": "^1.0.4",
     "bcrypt-nodejs": "0.0.3",
     "chai": "^4.1.2",
     "chai-http": "^4.0.0",
