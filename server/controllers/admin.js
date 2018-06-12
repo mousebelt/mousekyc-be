@@ -190,10 +190,16 @@ exports.postSubmissionList = async (req, res, next) => {
 
 
 /**
+ * @function: Update user's identity document
+ * 
+ * @method: POST /update/identity
+ * 
  * @param {String|Required} token
  * @param {String|Required} useremail
- * @param {String} documentType
+ * @param {String|Required} documentType
  * @param {String|Required} identityDocument
+ * 
+ * @returns { status: 200, msg: "success", data: userRow }
  */
 exports.postUpdateIdentity = async (req, res) => {
   const gfs = req.app.get("gfs");
@@ -203,8 +209,8 @@ exports.postUpdateIdentity = async (req, res) => {
     return res.json({ status: 400, msg: "Invalid email !" });
   if (!token || token == "")
     return res.json({ status: 400, msg: "Empty token !" });
-  // if (!documentType || documentType == "")
-  //   return res.json({ status: 400, msg: "Empty document type !" });
+  if (!documentType || documentType == "")
+    return res.json({ status: 400, msg: "Empty document type !" });
   if (!identityDocument || identityDocument == "")
     return res.json({ status: 400, msg: "Empty identity document !" });
 
@@ -253,9 +259,15 @@ exports.postUpdateIdentity = async (req, res) => {
 };
 
 /**
+ * @function: Update user's identity document
+ * 
+ * @method: POST /update/selfie
+ * 
  * @param {String|Required} token
  * @param {String|Required} useremail
  * @param {String|Required} selfie
+ * 
+ * @returns { status: 200, msg: "success", data: userRow }
  */
 exports.postUpdateSelfie = async (req, res) => {
   const gfs = req.app.get("gfs");

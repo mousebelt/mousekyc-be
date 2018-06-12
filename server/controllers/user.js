@@ -177,8 +177,16 @@ exports.postUpdate = async (req, res) => {
 };
 
 /**
- * @param {String} documentType
- * @param {String} identityDocument
+ * @function: Update user identity document from token, email
+ *
+ * @method: POST /update/identity
+ *
+ * @param {String|Required} email
+ * @param {String|Required} token
+ * @param {String|Required} documentType
+ * @param {String|Required} identityDocument
+ * 
+ * @returns { status: 200, msg: "success", data: userRow }
  */
 exports.postUpdateIdentity = async (req, res) => {
   const gfs = req.app.get("gfs");
@@ -239,7 +247,15 @@ exports.postUpdateIdentity = async (req, res) => {
 };
 
 /**
- * @param {String} selfie
+ * @function: Update user selfie from token, email
+ *
+ * @method: POST /update/selfie
+ *
+ * @param {String|Required} email
+ * @param {String|Required} token
+ * @param {String|Required} selfie
+ * 
+ * @returns { status: 200, msg: "success", data: userRow }
  */
 exports.postUpdateSelfie = async (req, res) => {
   const gfs = req.app.get("gfs");
