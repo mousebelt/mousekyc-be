@@ -1,6 +1,5 @@
-const nodemailer = require("nodemailer");
-const config = require("../config");
 const mailcomposer = require("mailcomposer");
+const config = require("../config");
 
 exports.send = (from, to, subject, text) => {
   const mailgun = require('mailgun-js')({ apiKey: config.email.mailgun.private, domain: config.email.domain });
@@ -37,20 +36,3 @@ exports.send = (from, to, subject, text) => {
     });
   });
 };
-// exports.send = (sender, recipient, subject, text) => {
-//   const transporter = nodemailer.createTransport({
-//     service: "SendGrid",
-//     auth: {
-//       user: config.email.sendgrid.USER,
-//       pass: config.email.sendgrid.PASS
-//     }
-//   });
-//   const mailOptions = {
-//     to: recipient,
-//     from: sender,
-//     subject,
-//     text
-//   };
-//   return transporter
-//     .sendMail(mailOptions);
-// };
