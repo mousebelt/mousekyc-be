@@ -220,20 +220,19 @@ exports.postUpdateIdentity = async (req, res) => {
     var filename = `identityDocument-${Date.now()}`;
 
     var contentType = identityDocument.split(";")[0].split(":")[1];
-    if (contentType == "jpeg" || contentType == "jpg")
+    if (contentType == "image/jpeg" || contentType == "image/jpg")
       filename = `${filename}.jpg`;
-    else if (contentType == "gif") filename = `${filename}.gif`;
-    else if (contentType == "png") filename = `${filename}.png`;
+    else if (contentType == "image/gif") filename = `${filename}.gif`;
+    else if (contentType == "image/png") filename = `${filename}.png`;
     else filename = `${filename}.tiff`;
 
     var filepath = base64Img.imgSync(identityDocument, "./uploads", filename);
     var writestream = gfs.createWriteStream({ filename });
     fs.createReadStream(filepath)
       .on("end", function () {
-        console.log('--- end ----', filename, filepath);
-        // fs.unlink(filepath, function(err) {
-        //   if (err) console.log("unlink error: ", err);
-        // });
+        fs.unlink(filepath, function(err) {
+          if (err) console.log("unlink error: ", err);
+        });
       })
       .pipe(writestream);
     // Add user
@@ -281,20 +280,19 @@ exports.postUpdateSelfie = async (req, res) => {
     var filename = `selfie-${Date.now()}`;
 
     var contentType = selfie.split(";")[0].split(":")[1];
-    if (contentType == "jpeg" || contentType == "jpg")
+    if (contentType == "image/jpeg" || contentType == "image/jpg")
       filename = `${filename}.jpg`;
-    else if (contentType == "gif") filename = `${filename}.gif`;
-    else if (contentType == "png") filename = `${filename}.png`;
+    else if (contentType == "image/gif") filename = `${filename}.gif`;
+    else if (contentType == "image/png") filename = `${filename}.png`;
     else filename = `${filename}.tiff`;
 
     var filepath = base64Img.imgSync(selfie, "./uploads", filename);
     var writestream = gfs.createWriteStream({ filename });
     fs.createReadStream(filepath)
       .on("end", function () {
-        console.log('--- end ----', filename, filepath);
-        // fs.unlink(filepath, function(err) {
-        //   if (err) console.log("unlink error: ", err);
-        // });
+        fs.unlink(filepath, function(err) {
+          if (err) console.log("unlink error: ", err);
+        });
       })
       .pipe(writestream);
     // Add user
