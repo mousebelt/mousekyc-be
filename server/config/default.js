@@ -3,14 +3,11 @@ const config = {
   db: 'mongodb://mongo:27017/kyc-db',
   // db: 'mongodb://localhost:27017/kyc-db',
   email: {
-    domain: 'icodashboard.space',
+    domain: 'mail.norestlabs.com',
     mailgun: {
-      secret: 'key-0123456789'
+      public: 'pubkey-c34e8a067ae814f5efdb8a6ac6631ca5',
+      private: '618dc03859a470f79b02cce432d679ad-47317c98-64c69d9d'
     },
-    // mailjet: {
-    //   apiKey: MAILJET_API_KEY,
-    //   apiSecret: MAILJET_API_SECRET
-    // },
     sendgrid: {
       USER: "ohtayoshida",
       PASS: "sendgrid123"

@@ -58,9 +58,9 @@ exports.postSignup = (req, res, next) => {
         token = buf.toString("hex");
 
         MailService.send(config.email.from.general, user.email, "Thanks for your registeration", `Welcome.\n\nYou are receiving this because you sign up.\n\n`)
-          .then(() => { })
+          .then((body) => { console.log({ body }); })
           .catch(error => {
-            console.log("Error occur while sending email");
+            console.log("Error occur while sending email", error);
           });
       });
 

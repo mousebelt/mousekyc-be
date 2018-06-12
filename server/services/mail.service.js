@@ -1,9 +1,9 @@
 const nodemailer = require("nodemailer");
 const config = require("../config");
 const mailcomposer = require("mailcomposer");
- 
+
 exports.send = (from, to, subject, text) => {
-  const mailgun = require('mailgun-js')({apiKey: config.email.mailgun.scret, domain: config.email.domain});
+  const mailgun = require('mailgun-js')({ apiKey: config.email.mailgun.private, domain: config.email.domain });
   // const mailOptions = {
   //   from,
   //   to,
@@ -14,28 +14,28 @@ exports.send = (from, to, subject, text) => {
   //   console.log(body);
   // });
   return new Promise((resolve, reject) => {
-      let mail = mailcomposer({
-        from,
+    let mail = mailcomposer({
+      from,
+      to,
+      subject,
+      html: text
+    });
+
+    mail.build((mailBuildError, message) => {
+      let dataToSend = {
         to,
-        subject,
-        html: text
-      });
+        message: message.toString('ascii')
+      };
 
-      mail.build((mailBuildError, message) => {
-        let dataToSend = {
-          to: recipient,
-          message: message.toString('ascii')
-        };
-
-        mailgun.messages().sendMime(dataToSend, (err, body) => {
-          if (err) {
-            // this.logger.exception(err);
-            reject(new Error(err));
-          }
-          resolve(body);
-        });
+      mailgun.messages().sendMime(dataToSend, (err, body) => {
+        if (err) {
+          // this.logger.exception(err);
+          reject(new Error(err));
+        }
+        resolve(body);
       });
     });
+  });
 };
 // exports.send = (sender, recipient, subject, text) => {
 //   const transporter = nodemailer.createTransport({
