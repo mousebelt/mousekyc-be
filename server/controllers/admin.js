@@ -259,7 +259,7 @@ exports.postUpdateIdentity = async (req, res) => {
 };
 
 /**
- * @function: Update user's identity document
+ * @function: Update user's selfie
  * 
  * @method: POST /update/selfie
  * 
