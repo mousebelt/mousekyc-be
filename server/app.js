@@ -1,5 +1,5 @@
 const fs = require("fs");
-const join = require('path').join;
+const join = require("path").join;
 const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
@@ -8,12 +8,12 @@ const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
 const nocache = require("nocache");
 const http = require("http");
-const passport = require('passport');
+const passport = require("passport");
 var Grid = require("gridfs-stream");
 Grid.mongo = mongoose.mongo;
 
 const config = require("./config");
-// config                                                                                     
+// config
 app.set("config", config);
 const port = process.env.PORT || config.port;
 
@@ -36,21 +36,15 @@ mongoose
 // models
 const models = join(__dirname, "./models");
 // Bootstrap models
-fs
-  .readdirSync(models)
+fs.readdirSync(models)
   .filter(file => ~file.search(/^[^\.].*\.js$/))
   .forEach(file => require(join(models, file)));
 
 // Routing
 app.use(require("cors")());
 app.use(cookieParser());
-app.use(bodyParser.json()); // to support JSON-encoded bodies
-app.use(
-  bodyParser.urlencoded({
-    // to support URL-encoded bodies
-    extended: true
-  })
-);
+app.use(bodyParser.json({ limit: "50mb" })); // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(fileUpload());
 app.use(nocache());
 
@@ -86,4 +80,4 @@ server.listen(port, function() {
   console.log("Server listening at port %d", port);
 });
 
-module.exports = server
+module.exports = server;
