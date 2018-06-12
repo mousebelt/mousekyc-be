@@ -251,7 +251,7 @@ exports.postUpdateSelfie = async (req, res) => {
   if (!token || token == "")
     return res.json({ status: 400, msg: "Empty token !" });
   if (!selfie || selfie == "")
-    return res.json({ status: 400, msg: "Empty document type !" });
+    return res.json({ status: 400, msg: "Empty selfie !" });
 
   try {
     var userRow = await UserModel.findOne({ email });
@@ -283,7 +283,6 @@ exports.postUpdateSelfie = async (req, res) => {
       .pipe(writestream);
     // Add user
     userRow.set({
-      documentType,
       selfie: filename,
       approvalStatus: 'PENDING'
     });

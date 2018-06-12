@@ -141,7 +141,7 @@ exports.postApproveUser = async (req, res, next) => {
 
   // logic
   var loggedAdmin = AuthModule.getAdminFromToken(token);
-  if (!loggedAdmin) return res.json({ status: 400, msg: 'token is not invalid !' });
+  if (!loggedAdmin) return res.json({ status: 400, msg: 'token is not valid !' });
 
   var userRow = await UserModel.findOne({ email: useremail });
   if (!userRow) return res.json({ status: 400, msg: 'user email is not exsiting !' });
@@ -180,10 +180,135 @@ exports.postSubmissionList = async (req, res, next) => {
 
   // logic
   var loggedAdmin = AuthModule.getAdminFromToken(token);
-  if (!loggedAdmin) return res.json({ status: 400, msg: 'token is not invalid !' });
+  if (!loggedAdmin) return res.json({ status: 400, msg: 'token is not valid !' });
 
   var cond = approvalStatus ? { approvalStatus } : {};
   var submissions = await UserModel.find(cond).sort({ updatedAt: 1, approvalStatus: -1 }).skip(offset).limit(count);
 
   return res.json({ status: 200, msg: 'success', data: submissions });
+};
+
+
+/**
+ * @param {String|Required} token
+ * @param {String|Required} useremail
+ * @param {String} documentType
+ * @param {String|Required} identityDocument
+ */
+exports.postUpdateIdentity = async (req, res) => {
+  const gfs = req.app.get("gfs");
+  var { useremail, token, documentType, identityDocument } = req.body;
+
+  if (!UtilsModule.validateEmail(useremail))
+    return res.json({ status: 400, msg: "Invalid email !" });
+  if (!token || token == "")
+    return res.json({ status: 400, msg: "Empty token !" });
+  // if (!documentType || documentType == "")
+  //   return res.json({ status: 400, msg: "Empty document type !" });
+  if (!identityDocument || identityDocument == "")
+    return res.json({ status: 400, msg: "Empty identity document !" });
+
+  // logic
+  var loggedAdmin = AuthModule.getAdminFromToken(token);
+  if (!loggedAdmin) return res.json({ status: 400, msg: 'token is not valid !' });
+
+  try {
+    var userRow = await UserModel.findOne({ email: useremail });
+    if (!userRow) return res.json({ status: 400, msg: "No existing user !" });
+
+    // save file
+    var filename = `identityDocument-${Date.now()}`;
+
+    var contentType = identityDocument.split(";")[0].split(":")[1];
+    if (contentType == "jpeg" || contentType == "jpg")
+      filename = `${filename}.jpg`;
+    else if (contentType == "gif") filename = `${filename}.gif`;
+    else if (contentType == "png") filename = `${filename}.png`;
+    else filename = `${filename}.tiff`;
+
+    var filepath = base64Img.imgSync(identityDocument, "./uploads", filename);
+    var writestream = gfs.createWriteStream({ filename });
+    fs.createReadStream(filepath)
+      .on("end", function () {
+        console.log('--- end ----', filename, filepath);
+        // fs.unlink(filepath, function(err) {
+        //   if (err) console.log("unlink error: ", err);
+        // });
+      })
+      .pipe(writestream);
+    // Add user
+    userRow.set({
+      documentType: documentType || userRow.documentType,
+      identityDocument: filename,
+    });
+
+    userRow.save(err => {
+      if (err) {
+        return res.json({ status: 400, msg: "User save error !", data: err });
+      }
+      return res.json({ status: 200, msg: "success", data: userRow });
+    });
+  } catch (error) {
+    return res.json({ status: 400, msg: "DB is not working !", data: error });
+  }
+};
+
+/**
+ * @param {String|Required} token
+ * @param {String|Required} useremail
+ * @param {String|Required} selfie
+ */
+exports.postUpdateSelfie = async (req, res) => {
+  const gfs = req.app.get("gfs");
+  var { useremail, token, selfie } = req.body;
+
+  if (!UtilsModule.validateEmail(useremail))
+    return res.json({ status: 400, msg: "Invalid user email !" });
+  if (!token || token == "")
+    return res.json({ status: 400, msg: "Empty token !" });
+  if (!selfie || selfie == "")
+    return res.json({ status: 400, msg: "Empty selfie !" });
+
+  // logic
+  var loggedAdmin = AuthModule.getAdminFromToken(token);
+  if (!loggedAdmin) return res.json({ status: 400, msg: 'token is not valid !' });
+
+  try {
+    var userRow = await UserModel.findOne({ email: useremail });
+    if (!userRow) return res.json({ status: 400, msg: "No existing user !" });
+
+    // save file
+    var filename = `selfie-${Date.now()}`;
+
+    var contentType = selfie.split(";")[0].split(":")[1];
+    if (contentType == "jpeg" || contentType == "jpg")
+      filename = `${filename}.jpg`;
+    else if (contentType == "gif") filename = `${filename}.gif`;
+    else if (contentType == "png") filename = `${filename}.png`;
+    else filename = `${filename}.tiff`;
+
+    var filepath = base64Img.imgSync(selfie, "./uploads", filename);
+    var writestream = gfs.createWriteStream({ filename });
+    fs.createReadStream(filepath)
+      .on("end", function () {
+        console.log('--- end ----', filename, filepath);
+        // fs.unlink(filepath, function(err) {
+        //   if (err) console.log("unlink error: ", err);
+        // });
+      })
+      .pipe(writestream);
+    // Add user
+    userRow.set({
+      selfie: filename,
+    });
+
+    userRow.save(err => {
+      if (err) {
+        return res.json({ status: 400, msg: "User save error !", data: err });
+      }
+      return res.json({ status: 200, msg: "success", data: userRow });
+    });
+  } catch (error) {
+    return res.json({ status: 400, msg: "DB is not working !", data: error });
+  }
 };
