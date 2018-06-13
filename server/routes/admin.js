@@ -5,6 +5,7 @@ const AdminController = require('../controllers/admin')
 
 // get
 router.get('/submission_list', AdminController.getSubmissionList)
+router.get('/userdocuments', AdminController.getUserDocuments)
 
 // post
 router.post('/signup', AdminController.postSignup)
