@@ -162,6 +162,7 @@ exports.postApproveUser = async (req, res, next) => {
  * @param {String|Required} token
  * @param {Number} offset
  * @param {Number} count
+ * @param {String} approvalStatus
  * 
  * @return
  * { "status": 200, "msg": "success", data: [submission] }
@@ -186,6 +187,64 @@ exports.getSubmissionList = async (req, res, next) => {
   var submissions = await UserModel.find(cond).sort({ updatedAt: 1, approvalStatus: -1 }).skip(offset).limit(count);
   return res.json({ status: 200, msg: 'success', data: submissions });
 };
+
+
+/**
+ * @function: Get user documents
+ * 
+ * @method: GET /userdocuments
+ * 
+ * @param {String|Required} token
+ * @param {String|Required} useremail
+ * @param {String} type
+ * 
+ * @return
+ * { "status": 200, "msg": "success", data: [{documentType: base64_image}] }
+*/
+exports.getUserDocuments = async (req, res) => {
+  const gfs = req.app.get("gfs");
+
+  var token = req.query.token;
+  var useremail = req.query.useremail;
+  var type = req.query.type;
+
+  var docTypes = [];
+  // validation
+  if (!token || token == '') return res.json({ status: 400, msg: 'Empty token !' });
+  if (!UtilsModule.validateEmail(useremail)) return res.json({ status: 400, msg: 'Invalid user email !' });
+  if (type == 'selfie' || type == 'identityDocument') docTypes = [type];
+  else docTypes = ['identityDocument', 'selfie'];
+
+  // logic
+  var loggedAdmin = await AuthModule.getAdminFromToken(token);
+  if (!loggedAdmin) return res.json({ status: 400, msg: 'token is not valid !' });
+
+  try {
+    var userRow = await UserModel.findOne({ email: useremail });
+    if (!userRow) return res.json({ status: 400, msg: 'Not existing user email !' });
+
+    var documents = [];
+    for (let i = 0; i < docTypes.length; i++) {
+      var key = docTypes[i];
+      var filename = userRow[key];
+      if (!filename || filename == '') continue;
+
+      try {
+        var file = await UtilsModule.getImageDataFromGrid(gfs, filename);
+        if (file) {
+          var item = {};
+          item[key] = file;
+          documents.push(item);
+        }
+      } catch (error) { }
+    }
+
+    return res.json({ status: 200, msg: 'success', data: documents });
+  } catch (error) {
+    console.log({ error })
+    return res.json({ status: 400, msg: 'Error !', data: error });
+  }
+}
 
 /**
  * @function: Update user's identity document
