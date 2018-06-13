@@ -4,6 +4,7 @@ const globalController = require('../controllers/global')
 
 // get
 router.get('/countries', globalController.getCountries)
+router.get('/image/:filename', globalController.getImageFile)
 
 // post
 

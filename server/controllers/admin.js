@@ -1,3 +1,4 @@
+const base64Img = require("base64-img");
 const bluebird = require("bluebird");
 const crypto = bluebird.promisifyAll(require("crypto"));
 const passport = require("passport");
@@ -139,7 +140,7 @@ exports.postApproveUser = async (req, res, next) => {
   if (!approvalStatus || approvalStatus == '') return res.json({ status: 400, msg: 'Empty approvalStatus !' });
 
   // logic
-  var loggedAdmin = AuthModule.getAdminFromToken(token);
+  var loggedAdmin = await AuthModule.getAdminFromToken(token);
   if (!loggedAdmin) return res.json({ status: 400, msg: 'token is not valid !' });
 
   var userRow = await UserModel.findOne({ email: useremail });
@@ -156,7 +157,7 @@ exports.postApproveUser = async (req, res, next) => {
 /**
  * @function: List submissions
  * 
- * @method: POST /submission_list
+ * @method: GET /submission_list
  * 
  * @param {String|Required} token
  * @param {Number} offset
@@ -165,11 +166,11 @@ exports.postApproveUser = async (req, res, next) => {
  * @return
  * { "status": 200, "msg": "success", data: [submission] }
 */
-exports.postSubmissionList = async (req, res, next) => {
-  var token = req.body.token;
-  var approvalStatus = req.body.approvalStatus;
-  var offset = Number(req.body.offset);
-  var count = Number(req.body.count);
+exports.getSubmissionList = async (req, res, next) => {
+  var token = req.query.token;
+  var approvalStatus = req.query.approvalStatus;
+  var offset = Number(req.query.offset);
+  var count = Number(req.query.count);
 
   if (!offset) offset = 0;
   if (!count) count = 16;
@@ -178,15 +179,13 @@ exports.postSubmissionList = async (req, res, next) => {
   if (!token || token == '') return res.json({ status: 400, msg: 'Empty token !' });
 
   // logic
-  var loggedAdmin = AuthModule.getAdminFromToken(token);
+  var loggedAdmin = await AuthModule.getAdminFromToken(token);
   if (!loggedAdmin) return res.json({ status: 400, msg: 'token is not valid !' });
 
   var cond = approvalStatus ? { approvalStatus } : {};
   var submissions = await UserModel.find(cond).sort({ updatedAt: 1, approvalStatus: -1 }).skip(offset).limit(count);
-
   return res.json({ status: 200, msg: 'success', data: submissions });
 };
-
 
 /**
  * @function: Update user's identity document
@@ -214,7 +213,7 @@ exports.postUpdateIdentity = async (req, res) => {
     return res.json({ status: 400, msg: "Empty identity document !" });
 
   // logic
-  var loggedAdmin = AuthModule.getAdminFromToken(token);
+  var loggedAdmin = await AuthModule.getAdminFromToken(token);
   if (!loggedAdmin) return res.json({ status: 400, msg: 'token is not valid !' });
 
   try {
@@ -222,24 +221,9 @@ exports.postUpdateIdentity = async (req, res) => {
     if (!userRow) return res.json({ status: 400, msg: "No existing user !" });
 
     // save file
-    var filename = `identityDocument-${Date.now()}`;
-
     var contentType = identityDocument.split(";")[0].split(":")[1];
-    if (contentType == "image/jpeg" || contentType == "image/jpg")
-      filename = `${filename}.jpg`;
-    else if (contentType == "image/gif") filename = `${filename}.gif`;
-    else if (contentType == "image/png") filename = `${filename}.png`;
-    else filename = `${filename}.tiff`;
-
-    var filepath = base64Img.imgSync(identityDocument, "./uploads", filename);
-    var writestream = gfs.createWriteStream({ filename });
-    fs.createReadStream(filepath)
-      .on("end", function () {
-        fs.unlink(filepath, function(err) {
-          if (err) console.log("unlink error: ", err);
-        });
-      })
-      .pipe(writestream);
+    var filename = `identityDocument-${Date.now()}.${UtilsModule.getImageExt(contentType)}`;
+    UtilsModule.saveImagetoGrid(gfs, filename, identityDocument, contentType);
     // Add user
     userRow.set({
       documentType: documentType || userRow.documentType,
@@ -280,7 +264,7 @@ exports.postUpdateSelfie = async (req, res) => {
     return res.json({ status: 400, msg: "Empty selfie !" });
 
   // logic
-  var loggedAdmin = AuthModule.getAdminFromToken(token);
+  var loggedAdmin = await AuthModule.getAdminFromToken(token);
   if (!loggedAdmin) return res.json({ status: 400, msg: 'token is not valid !' });
 
   try {
@@ -288,24 +272,9 @@ exports.postUpdateSelfie = async (req, res) => {
     if (!userRow) return res.json({ status: 400, msg: "No existing user !" });
 
     // save file
-    var filename = `selfie-${Date.now()}`;
-
     var contentType = selfie.split(";")[0].split(":")[1];
-    if (contentType == "image/jpeg" || contentType == "image/jpg")
-      filename = `${filename}.jpg`;
-    else if (contentType == "image/gif") filename = `${filename}.gif`;
-    else if (contentType == "image/png") filename = `${filename}.png`;
-    else filename = `${filename}.tiff`;
-
-    var filepath = base64Img.imgSync(selfie, "./uploads", filename);
-    var writestream = gfs.createWriteStream({ filename });
-    fs.createReadStream(filepath)
-      .on("end", function () {
-        fs.unlink(filepath, function(err) {
-          if (err) console.log("unlink error: ", err);
-        });
-      })
-      .pipe(writestream);
+    var filename = `selfie-${Date.now()}.${UtilsModule.getImageExt(contentType)}`;
+    UtilsModule.saveImagetoGrid(gfs, filename, selfie, contentType);
     // Add user
     userRow.set({
       selfie: filename,

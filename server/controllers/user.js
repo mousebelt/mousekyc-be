@@ -210,24 +210,9 @@ exports.postUpdateIdentity = async (req, res) => {
       return res.json({ status: 400, msg: "status is blocked !" });
 
     // save file
-    var filename = `identityDocument-${Date.now()}`;
-
     var contentType = identityDocument.split(";")[0].split(":")[1];
-    if (contentType == "image/jpeg" || contentType == "image/jpg")
-      filename = `${filename}.jpg`;
-    else if (contentType == "image/gif") filename = `${filename}.gif`;
-    else if (contentType == "image/png") filename = `${filename}.png`;
-    else filename = `${filename}.tiff`;
-
-    var filepath = base64Img.imgSync(identityDocument, "./uploads", filename);
-    var writestream = gfs.createWriteStream({ filename });
-    fs.createReadStream(filepath)
-      .on("end", function() {
-        fs.unlink(filepath, function(err) {
-          if (err) console.log("unlink error: ", err);
-        });
-      })
-      .pipe(writestream);
+    var filename = `identityDocument-${Date.now()}.${UtilsModule.getImageExt(contentType)}`;
+    UtilsModule.saveImagetoGrid(gfs, filename, identityDocument, contentType);
     // Add user
     userRow.set({
       documentType,
@@ -242,6 +227,7 @@ exports.postUpdateIdentity = async (req, res) => {
       return res.json({ status: 200, msg: "success", data: userRow });
     });
   } catch (error) {
+    console.log(error);
     return res.json({ status: 400, msg: "DB is not working !", data: error });
   }
 };
@@ -277,24 +263,11 @@ exports.postUpdateSelfie = async (req, res) => {
       return res.json({ status: 400, msg: "status is blocked !" });
 
     // save file
-    var filename = `selfie-${Date.now()}`;
-
     var contentType = selfie.split(";")[0].split(":")[1];
-    if (contentType == "image/jpeg" || contentType == "image/jpg")
-      filename = `${filename}.jpg`;
-    else if (contentType == "image/gif") filename = `${filename}.gif`;
-    else if (contentType == "image/png") filename = `${filename}.png`;
-    else filename = `${filename}.tiff`;
 
-    var filepath = base64Img.imgSync(selfie, "./uploads", filename);
-    var writestream = gfs.createWriteStream({ filename });
-    fs.createReadStream(filepath)
-      .on("end", function() {
-        fs.unlink(filepath, function(err) {
-          if (err) console.log("unlink error: ", err);
-        });
-      })
-      .pipe(writestream);
+    var filename = `selfie-${Date.now()}`;
+    filename = `${filename}.${UtilsModule.getImageExt(contentType)}`;
+    UtilsModule.saveImagetoGrid(gfs, filename, selfie, contentType);
     // Add user
     userRow.set({
       selfie: filename,
