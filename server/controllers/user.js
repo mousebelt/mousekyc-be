@@ -126,23 +126,11 @@ exports.postUpdate = async (req, res) => {
     if (!userRow) return res.json({ status: 400, msg: "No existing user !" });
     if (userRow.token != token)
       return res.json({ status: 400, msg: "Invalid token !" });
+
     if (userRow.approvalStatus == "BLOCKED")
       return res.json({ status: 400, msg: "status is blocked !" });
-    if (
-      firstname ||
-      lastname ||
-      dob ||
-      documentExpireDate ||
-      nationalityCountry ||
-      documentId ||
-      phone ||
-      residenceCountry ||
-      residenceAddress ||
-      adminContact ||
-      adminMessage ||
-      backgroundCheckId
-    )
-      userRow.approvalStatus = "PENDING";
+    // if (userRow.approvalStatus == "APPROVED")
+    //   return res.json({ status: 400, msg: "status is approved !" });
 
     // Add user
     userRow.set({
@@ -163,6 +151,17 @@ exports.postUpdate = async (req, res) => {
       adminMessage: adminMessage || userRow.adminMessage,
       backgroundCheckId: backgroundCheckId || userRow.backgroundCheckId
     });
+
+    if (
+      userRow.firstname ||
+      userRow.lastname ||
+      userRow.dob ||
+      userRow.documentExpireDate ||
+      userRow.nationalityCountry ||
+      userRow.documentId ||
+      userRow.residenceCountry
+    )
+      userRow.approvalStatus = "PENDING";
 
     userRow.save(err => {
       if (err) {
@@ -185,7 +184,7 @@ exports.postUpdate = async (req, res) => {
  * @param {String|Required} token
  * @param {String|Required} documentType
  * @param {String|Required} identityDocument
- * 
+ *
  * @returns { status: 200, msg: "success", data: userRow }
  */
 exports.postUpdateIdentity = async (req, res) => {
@@ -210,13 +209,15 @@ exports.postUpdateIdentity = async (req, res) => {
       return res.json({ status: 400, msg: "status is blocked !" });
 
     // save file
-    var filename = `identityDocument-${Date.now()}.${UtilsModule.getImageExt(identityDocument)}`;
+    var filename = `identityDocument-${Date.now()}.${UtilsModule.getImageExt(
+      identityDocument
+    )}`;
     UtilsModule.saveImagetoGrid(gfs, filename, identityDocument);
     // Add user
     userRow.set({
       documentType,
       identityDocument: filename,
-      approvalStatus: 'PENDING'
+      approvalStatus: "PENDING"
     });
 
     userRow.save(err => {
@@ -239,7 +240,7 @@ exports.postUpdateIdentity = async (req, res) => {
  * @param {String|Required} email
  * @param {String|Required} token
  * @param {String|Required} selfie
- * 
+ *
  * @returns { status: 200, msg: "success", data: userRow }
  */
 exports.postUpdateSelfie = async (req, res) => {
@@ -268,7 +269,7 @@ exports.postUpdateSelfie = async (req, res) => {
     // Add user
     userRow.set({
       selfie: filename,
-      approvalStatus: 'PENDING'
+      approvalStatus: "PENDING"
     });
 
     userRow.save(err => {
