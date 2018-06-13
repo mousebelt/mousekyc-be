@@ -129,8 +129,8 @@ exports.postUpdate = async (req, res) => {
 
     if (userRow.approvalStatus == "BLOCKED")
       return res.json({ status: 400, msg: "status is blocked !" });
-    // if (userRow.approvalStatus == "APPROVED")
-    //   return res.json({ status: 400, msg: "status is approved !" });
+    if (userRow.approvalStatus == "APPROVED")
+      return res.json({ status: 400, msg: "status is approved !" });
 
     // Add user
     userRow.set({
@@ -151,17 +151,6 @@ exports.postUpdate = async (req, res) => {
       adminMessage: adminMessage || userRow.adminMessage,
       backgroundCheckId: backgroundCheckId || userRow.backgroundCheckId
     });
-
-    if (
-      userRow.firstname ||
-      userRow.lastname ||
-      userRow.dob ||
-      userRow.documentExpireDate ||
-      userRow.nationalityCountry ||
-      userRow.documentId ||
-      userRow.residenceCountry
-    )
-      userRow.approvalStatus = "PENDING";
 
     userRow.save(err => {
       if (err) {
@@ -217,7 +206,7 @@ exports.postUpdateIdentity = async (req, res) => {
     userRow.set({
       documentType,
       identityDocument: filename,
-      approvalStatus: "PENDING"
+      // approvalStatus: "PENDING"
     });
 
     userRow.save(err => {
