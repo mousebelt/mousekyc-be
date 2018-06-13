@@ -93,14 +93,14 @@ exports.postLogin = (req, res, next) => {
     return res.json({ status: 400, msg: "Password must be at least 4 characters long !" });
 
   // do process
-  passport.authenticate("local", (err, user, info) => {
+  passport.authenticate("admin", (err, user, info) => {
     if (err) {
       return res.json({ status: 400, msg: 'errors', data: err });
     }
     if (!user) {
       return res.json({
         status: 400,
-        msg: "Invalid user or password !"
+        msg: info.msg
       });
     }
     req.logIn(user, err => {

@@ -1,9 +1,12 @@
+const passport = require("passport");
 const base64Img = require("base64-img");
 const cryptoRandomString = require("crypto-random-string");
 const fs = require("fs");
+
 const config = require("../config");
 var UserModel = require("../models/user");
-var UtilsModule = require("../modules/utils");
+const AuthModule = require("../modules/auth");
+const UtilsModule = require("../modules/utils");
 const MailService = require("../services/mail.service");
 
 /**
@@ -21,25 +24,24 @@ const MailService = require("../services/mail.service");
  * }
  */
 exports.getInfoToken = async (req, res) => {
-  var token = String(req.params.token);
+  var token = req.params.token;
 
-  try {
-    var userRow = await UserModel.findOne({ token });
-    if (!userRow) return res.json({ status: 400, msg: "Invalid token !" });
+  if (!token || token == "")
+    return res.json({ status: 400, msg: "Empty token !" });
+  var loggedUser = await AuthModule.getUserFromToken(token);
+  if (!loggedUser)
+    return res.json({ status: 400, msg: "token is not valid !" });
 
-    return res.json({
-      status: 200,
-      msg: "success",
-      data: {
-        email: userRow.email,
-        token,
-        approvalStatus: userRow.approvalStatus,
-        approvalDescription: userRow.approvalDescription
-      }
-    });
-  } catch (error) {
-    return res.json({ status: 400, msg: "User read error !", data: error });
-  }
+  return res.json({
+    status: 200,
+    msg: "success",
+    data: {
+      email: loggedUser.email,
+      token,
+      approvalStatus: loggedUser.approvalStatus,
+      approvalDescription: loggedUser.approvalDescription
+    }
+  });
 };
 
 /**
@@ -50,30 +52,51 @@ exports.getInfoToken = async (req, res) => {
  * @param {String|Required} email
  *
  * @return
- * { "status": 200, "msg": "success", data: { token, email } }
+ * { "status": 200, "msg": "success", data: { token } }
  */
-exports.postGenToken = async (req, res) => {
+exports.postGenToken = async (req, res, next) => {
   var email = String(req.body.email);
   if (!UtilsModule.validateEmail(email))
     return res.json({ status: 400, msg: "Invalid email !" });
 
-  var token = cryptoRandomString(13) + String(Date.now());
-  var tokenExpireDate = Date.now() + 3600 * 1000;
-
   var userRow = await UserModel.findOne({ email });
-  if (!userRow) userRow = new UserModel({ email });
-  userRow.set({ token, tokenExpireDate });
-  userRow.save();
+  if (!userRow) {
+    var password = cryptoRandomString(7);
+    userRow = new UserModel({ email, password, default_password: password });
+    await userRow.save();
+  }
 
-  return res.json({ status: 200, msg: "success", data: { token, email } });
+  req.body.password = req.body.password
+    ? req.body.password
+    : userRow.default_password;
+  // do process
+  passport.authenticate("user", (err, user, info) => {
+    if (err) {
+      return res.json({ status: 400, msg: "errors", data: err });
+    }
+    if (!user) {
+      return res.json({
+        status: 400,
+        msg: info.msg
+      });
+    }
+    req.logIn(user, err => {
+      if (err) {
+        return res.json({ status: 400, msg: "errors", data: err });
+      }
+
+      var token = AuthModule.makeLoginToken(user._id, { expiresIn: "7d" });
+      res.set("authorization", token);
+      res.json({ status: 200, msg: "success", data: { token } });
+    });
+  })(req, res, next);
 };
 
 /**
- * @function: Update user from token, email
+ * @function: Update user from token
  *
  * @method: POST /update
  *
- * @param {String|Required} email
  * @param {String|Required} token
  *
  * @param {String} firstname
@@ -97,7 +120,6 @@ exports.postGenToken = async (req, res) => {
 exports.postUpdate = async (req, res) => {
   const gfs = req.app.get("gfs");
   var {
-    email,
     token,
     //
     firstname,
@@ -116,16 +138,16 @@ exports.postUpdate = async (req, res) => {
     backgroundCheckId
   } = req.body;
 
-  if (!UtilsModule.validateEmail(email))
-    return res.json({ status: 400, msg: "Invalid email !" });
+  // validation
   if (!token || token == "")
     return res.json({ status: 400, msg: "Empty token !" });
+  var loggedUser = await AuthModule.getUserFromToken(token);
+  if (!loggedUser)
+    return res.json({ status: 400, msg: "token is not valid !" });
 
+  // logic
   try {
-    var userRow = await UserModel.findOne({ email });
-    if (!userRow) return res.json({ status: 400, msg: "No existing user !" });
-    if (userRow.token != token)
-      return res.json({ status: 400, msg: "Invalid token !" });
+    var userRow = await UserModel.findOne({ _id: loggedUser._id });
 
     if (userRow.approvalStatus == "BLOCKED")
       return res.json({ status: 400, msg: "status is blocked !" });
@@ -169,7 +191,6 @@ exports.postUpdate = async (req, res) => {
  *
  * @method: POST /update/identity
  *
- * @param {String|Required} email
  * @param {String|Required} token
  * @param {String|Required} documentType
  * @param {String|Required} identityDocument
@@ -178,22 +199,22 @@ exports.postUpdate = async (req, res) => {
  */
 exports.postUpdateIdentity = async (req, res) => {
   const gfs = req.app.get("gfs");
-  var { email, token, documentType, identityDocument } = req.body;
+  var { token, documentType, identityDocument } = req.body;
 
-  if (!UtilsModule.validateEmail(email))
-    return res.json({ status: 400, msg: "Invalid email !" });
+  // validation
   if (!token || token == "")
     return res.json({ status: 400, msg: "Empty token !" });
+  var loggedUser = await AuthModule.getUserFromToken(token);
+  if (!loggedUser)
+    return res.json({ status: 400, msg: "token is not valid !" });
+
   if (!documentType || documentType == "")
     return res.json({ status: 400, msg: "Empty document type !" });
   if (!identityDocument || identityDocument == "")
     return res.json({ status: 400, msg: "Empty identity document !" });
 
   try {
-    var userRow = await UserModel.findOne({ email });
-    if (!userRow) return res.json({ status: 400, msg: "No existing user !" });
-    if (userRow.token != token)
-      return res.json({ status: 400, msg: "Invalid token !" });
+    var userRow = await UserModel.findOne({ _id: loggedUser._id });
     if (userRow.approvalStatus == "BLOCKED")
       return res.json({ status: 400, msg: "status is blocked !" });
 
@@ -205,7 +226,7 @@ exports.postUpdateIdentity = async (req, res) => {
     // Add user
     userRow.set({
       documentType,
-      identityDocument: filename,
+      identityDocument: filename
       // approvalStatus: "PENDING"
     });
 
@@ -222,11 +243,10 @@ exports.postUpdateIdentity = async (req, res) => {
 };
 
 /**
- * @function: Update user selfie from token, email
+ * @function: Update user selfie from token
  *
  * @method: POST /update/selfie
  *
- * @param {String|Required} email
  * @param {String|Required} token
  * @param {String|Required} selfie
  *
@@ -234,20 +254,21 @@ exports.postUpdateIdentity = async (req, res) => {
  */
 exports.postUpdateSelfie = async (req, res) => {
   const gfs = req.app.get("gfs");
-  var { email, token, selfie } = req.body;
+  var { token, selfie } = req.body;
 
-  if (!UtilsModule.validateEmail(email))
-    return res.json({ status: 400, msg: "Invalid email !" });
+  // validation
   if (!token || token == "")
     return res.json({ status: 400, msg: "Empty token !" });
-  if (!selfie || selfie == "")
+  var loggedUser = await AuthModule.getUserFromToken(token);
+  if (!loggedUser)
+    return res.json({ status: 400, msg: "token is not valid !" });
+
+    if (!selfie || selfie == "")
     return res.json({ status: 400, msg: "Empty selfie !" });
 
   try {
-    var userRow = await UserModel.findOne({ email });
-    if (!userRow) return res.json({ status: 400, msg: "No existing user !" });
-    if (userRow.token != token)
-      return res.json({ status: 400, msg: "Invalid token !" });
+    var userRow = await UserModel.findOne({ _id: loggedUser._id });
+
     if (userRow.approvalStatus == "BLOCKED")
       return res.json({ status: 400, msg: "status is blocked !" });
 
