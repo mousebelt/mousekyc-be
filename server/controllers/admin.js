@@ -221,9 +221,8 @@ exports.postUpdateIdentity = async (req, res) => {
     if (!userRow) return res.json({ status: 400, msg: "No existing user !" });
 
     // save file
-    var contentType = identityDocument.split(";")[0].split(":")[1];
-    var filename = `identityDocument-${Date.now()}.${UtilsModule.getImageExt(contentType)}`;
-    UtilsModule.saveImagetoGrid(gfs, filename, identityDocument, contentType);
+    var filename = `identityDocument-${Date.now()}.${UtilsModule.getImageExt(identityDocument)}`;
+    UtilsModule.saveImagetoGrid(gfs, filename, identityDocument);
     // Add user
     userRow.set({
       documentType: documentType || userRow.documentType,
@@ -272,9 +271,8 @@ exports.postUpdateSelfie = async (req, res) => {
     if (!userRow) return res.json({ status: 400, msg: "No existing user !" });
 
     // save file
-    var contentType = selfie.split(";")[0].split(":")[1];
-    var filename = `selfie-${Date.now()}.${UtilsModule.getImageExt(contentType)}`;
-    UtilsModule.saveImagetoGrid(gfs, filename, selfie, contentType);
+    var filename = `selfie-${Date.now()}.${UtilsModule.getImageExt(selfie)}`;
+    UtilsModule.saveImagetoGrid(gfs, filename, selfie);
     // Add user
     userRow.set({
       selfie: filename,

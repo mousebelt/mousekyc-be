@@ -210,9 +210,8 @@ exports.postUpdateIdentity = async (req, res) => {
       return res.json({ status: 400, msg: "status is blocked !" });
 
     // save file
-    var contentType = identityDocument.split(";")[0].split(":")[1];
-    var filename = `identityDocument-${Date.now()}.${UtilsModule.getImageExt(contentType)}`;
-    UtilsModule.saveImagetoGrid(gfs, filename, identityDocument, contentType);
+    var filename = `identityDocument-${Date.now()}.${UtilsModule.getImageExt(identityDocument)}`;
+    UtilsModule.saveImagetoGrid(gfs, filename, identityDocument);
     // Add user
     userRow.set({
       documentType,
@@ -263,11 +262,9 @@ exports.postUpdateSelfie = async (req, res) => {
       return res.json({ status: 400, msg: "status is blocked !" });
 
     // save file
-    var contentType = selfie.split(";")[0].split(":")[1];
-
     var filename = `selfie-${Date.now()}`;
-    filename = `${filename}.${UtilsModule.getImageExt(contentType)}`;
-    UtilsModule.saveImagetoGrid(gfs, filename, selfie, contentType);
+    filename = `${filename}.${UtilsModule.getImageExt(selfie)}`;
+    UtilsModule.saveImagetoGrid(gfs, filename, selfie);
     // Add user
     userRow.set({
       selfie: filename,
