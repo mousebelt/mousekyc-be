@@ -6,35 +6,62 @@ exports.validateEmail = email => {
   return re.test(String(email).toLowerCase());
 };
 
-exports.getImageDataFromGrid = async (gfs, filename) => {
+async function getInfoFromGrid(gfs, filename) {
   return new Promise((resolve, reject) => {
-    var rstream = gfs.createReadStream(filename);
-    var bufs = [];
-    rstream.on('data', function (chunk) {
-      bufs.push(chunk);
-    })
-      .on('error', function () {
-        reject(new Error('Error'));
-      })
-      .on('end', function () { // done
-        var fbuf = Buffer.concat(bufs);
-        var File = (fbuf.toString('base64'));
-        resolve(File);
-      });
+    gfs.files.findOne({ filename }, function (err, file) {
+      if (err) reject(err);
+      else resolve(file);
+    });
   });
 }
 
-exports.getImageExt = (contentType) => {
-  if (contentType == "image/jpeg" || contentType == "image/jpg") return 'jpg';
-  else if (contentType == "image/gif") return 'gif';
-  else if (contentType == "image/png") return 'png';
-  else return 'tiff';
+exports.getImageDataFromGrid = async (gfs, filename) => {
+  try {
+    info = await getInfoFromGrid(gfs, filename);
+    
+    return new Promise((resolve, reject) => {
+      var rstream = gfs.createReadStream(filename);
+      var bufs = [];
+      rstream.on('data', function (chunk) {
+        bufs.push(chunk);
+      })
+        .on('error', function () {
+          reject(new Error('Error'));
+        })
+        .on('end', function () { // done
+          var fbuf = Buffer.concat(bufs);
+          var File = `${info.metadata};base64,` + (fbuf.toString('base64'));
+          resolve(File);
+        });
+    });
+  } catch (error) {
+    console.log({ error });
+    reject(error);
+  }
 }
 
-exports.saveImagetoGrid = (gfs, filename, data, contentType = undefined) => {
+function getImageExt(base64_data) {
+  try {
+    var contentType = base64_data.split(";")[0].split(":")[1]
+    if (contentType == "image/jpeg" || contentType == "image/jpg") return 'jpg';
+    else if (contentType == "image/gif") return 'gif';
+    else if (contentType == "image/png") return 'png';
+    else return 'tiff';
+  } catch (error) {
+    return undefined;
+  }
+}
+exports.getImageExt = getImageExt;
+
+exports.saveImagetoGrid = (gfs, filename, data) => {
+  var metadata
+  try {
+    metadata = base64_data.split(";")[0];
+  } catch (error) {}
+
   var filepath = base64Img.imgSync(data, "./uploads", filename);
 
-  var writestream = gfs.createWriteStream({ filename });
+  var writestream = gfs.createWriteStream({ filename, metadata: metadata });
   fs.createReadStream(filepath)
     .on("end", function () {
       fs.unlink(filepath, function (err) {
