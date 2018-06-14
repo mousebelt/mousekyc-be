@@ -108,7 +108,7 @@ exports.postLogin = (req, res, next) => {
         return res.json({ status: 400, msg: 'errors', data: err });
       }
 
-      var token = AuthModule.makeLoginToken(user._id, { expiresIn: "7d" });
+      var token = AuthModule.makeAdminLoginToken(user._id, { expiresIn: "7d" });
       res.set("authorization", token);
       res.json({ status: 200, msg: "success", data: { token } });
     });

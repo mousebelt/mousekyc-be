@@ -12,6 +12,14 @@ exports.makeLoginToken = (payload, options) => {
     return jwt.sign({ _id: payload }, 'secret', options)
 }
 
+exports.makeUserLoginToken = (payload, options) => {
+    return jwt.sign({ _id: payload, type: 'user' }, 'secret', options)
+}
+
+exports.makeAdminLoginToken = (payload, options) => {
+    return jwt.sign({ _id: payload, type: 'admin' }, 'secret', options)
+}
+
 /**
  * Get loggedUserInfo
  * @param {request} req 
