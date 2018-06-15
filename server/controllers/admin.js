@@ -186,7 +186,8 @@ exports.getSubmissionList = async (req, res, next) => {
 
   var cond = approvalStatus ? { approvalStatus } : {};
   var submissions = await UserModel.find(cond).sort({ updatedAt: 1, approvalStatus: -1 }).skip(offset).limit(count);
-  return res.json({ status: 200, msg: 'success', data: submissions });
+  var total = await UserModel.find(cond).count();
+  return res.json({ status: 200, msg: 'success', data: { total, submissions } });
 };
 
 
