@@ -148,6 +148,7 @@ exports.postApproveUser = async (req, res, next) => {
 
   userRow.approvalStatus = approvalStatus;
   userRow.approvalDescription = approvalDescription;
+  userRow.adminContact = loggedAdmin.email;
   userRow.save(err => {
     if (err) return res.json({ status: 400, msg: 'user save error !' });
     return res.json({ status: 200, msg: 'success', data: userRow })
