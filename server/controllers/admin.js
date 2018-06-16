@@ -4,26 +4,26 @@ const crypto = bluebird.promisifyAll(require("crypto"));
 const passport = require("passport");
 const fs = require("fs");
 
-const config = require('../config');
+const config = require("../config");
 
 const AdminModel = require("../models/admin");
 const UserModel = require("../models/user");
 
 const AuthModule = require("../modules/auth");
 const UtilsModule = require("../modules/utils");
-const MailService = require('../services/mail.service');
+const MailService = require("../services/mail.service");
 
 /**
  * @function: Admin user signup
- * 
+ *
  * @method: POST /signup
- * 
+ *
  * @param {String|Required} email
  * @param {String|Required} password
- * 
+ *
  * @return
  * { "status": 200, "msg": "success" }
-*/
+ */
 exports.postSignup = (req, res, next) => {
   let { email, password } = req.body;
 
@@ -42,12 +42,11 @@ exports.postSignup = (req, res, next) => {
     }
 
     let user = existingUser;
-    if (user)
-      return res.json({ status: 400, msg: "User already existing !" });
+    if (user) return res.json({ status: 400, msg: "User already existing !" });
 
     user = new AdminModel({
       email,
-      password,
+      password
     });
     user.save(err => {
       if (err) {
@@ -57,8 +56,15 @@ exports.postSignup = (req, res, next) => {
       crypto.randomBytes(8, (err, buf) => {
         token = buf.toString("hex");
 
-        MailService.send(config.email.from.general, user.email, "Thanks for your registeration", `Welcome.\n\nYou are receiving this because you sign up.\n\n`)
-          .then((body) => { console.log({ body }); })
+        MailService.send(
+          config.email.from.general,
+          user.email,
+          "Thanks for your registeration",
+          `Welcome.\n\nYou are receiving this because you sign up.\n\n`
+        )
+          .then(body => {
+            console.log({ body });
+          })
           .catch(error => {
             console.log("Error occur while sending email", error);
           });
@@ -74,15 +80,15 @@ exports.postSignup = (req, res, next) => {
 
 /**
  * @function: Admin user login
- * 
+ *
  * @method: POST /login
- * 
+ *
  * @param {String|Required} email
  * @param {String|Required} password
- * 
+ *
  * @return
  * { "status": 200, "msg": "success", data: { token } }
-*/
+ */
 exports.postLogin = (req, res, next) => {
   var { email, password } = req.body;
 
@@ -90,12 +96,15 @@ exports.postLogin = (req, res, next) => {
   if (!UtilsModule.validateEmail(email))
     return res.json({ status: 400, msg: "Email is not valid !" });
   if (!password || String(password).length < 4)
-    return res.json({ status: 400, msg: "Password must be at least 4 characters long !" });
+    return res.json({
+      status: 400,
+      msg: "Password must be at least 4 characters long !"
+    });
 
   // do process
   passport.authenticate("admin", (err, user, info) => {
     if (err) {
-      return res.json({ status: 400, msg: 'errors', data: err });
+      return res.json({ status: 400, msg: "errors", data: err });
     }
     if (!user) {
       return res.json({
@@ -105,7 +114,7 @@ exports.postLogin = (req, res, next) => {
     }
     req.logIn(user, err => {
       if (err) {
-        return res.json({ status: 400, msg: 'errors', data: err });
+        return res.json({ status: 400, msg: "errors", data: err });
       }
 
       var token = AuthModule.makeAdminLoginToken(user._id, { expiresIn: "7d" });
@@ -117,17 +126,17 @@ exports.postLogin = (req, res, next) => {
 
 /**
  * @function: Set approval status, approval description of user
- * 
+ *
  * @method: POST /approve_user
- * 
+ *
  * @param {String|Required} token
  * @param {String|Required} useremail
  * @param {String|Required} approvalStatus
  * @param {String} approvalDescription
- * 
+ *
  * @return
  * { "status": 200, "msg": "success", data: userInfo }
-*/
+ */
 exports.postApproveUser = async (req, res, next) => {
   var token = req.body.token;
   var useremail = req.body.useremail;
@@ -135,39 +144,44 @@ exports.postApproveUser = async (req, res, next) => {
   var approvalDescription = req.body.approvalDescription;
 
   // validation
-  if (!token || token == '') return res.json({ status: 400, msg: 'Empty token !' });
-  if (!UtilsModule.validateEmail(useremail)) return res.json({ status: 400, msg: 'Invalid useremail !' });
-  if (!approvalStatus || approvalStatus == '') return res.json({ status: 400, msg: 'Empty approvalStatus !' });
+  if (!token || token == "")
+    return res.json({ status: 400, msg: "Empty token !" });
+  if (!UtilsModule.validateEmail(useremail))
+    return res.json({ status: 400, msg: "Invalid useremail !" });
+  if (!approvalStatus || approvalStatus == "")
+    return res.json({ status: 400, msg: "Empty approvalStatus !" });
 
   // logic
   var loggedAdmin = await AuthModule.getAdminFromToken(token);
-  if (!loggedAdmin) return res.json({ status: 400, msg: 'token is not valid !' });
+  if (!loggedAdmin)
+    return res.json({ status: 400, msg: "token is not valid !" });
 
   var userRow = await UserModel.findOne({ email: useremail });
-  if (!userRow) return res.json({ status: 400, msg: 'user email is not exsiting !' });
+  if (!userRow)
+    return res.json({ status: 400, msg: "user email is not exsiting !" });
 
   userRow.approvalStatus = approvalStatus;
   userRow.approvalDescription = approvalDescription;
   userRow.adminContact = loggedAdmin.email;
   userRow.save(err => {
-    if (err) return res.json({ status: 400, msg: 'user save error !' });
-    return res.json({ status: 200, msg: 'success', data: userRow })
-  })
+    if (err) return res.json({ status: 400, msg: "user save error !" });
+    return res.json({ status: 200, msg: "success", data: userRow });
+  });
 };
 
 /**
  * @function: List submissions
- * 
+ *
  * @method: GET /submission_list
- * 
+ *
  * @param {String|Required} token
  * @param {Number} offset
  * @param {Number} count
  * @param {String} approvalStatus
- * 
+ *
  * @return
  * { "status": 200, "msg": "success", data: [submission] }
-*/
+ */
 exports.getSubmissionList = async (req, res, next) => {
   var token = req.query.token;
   var approvalStatus = req.query.approvalStatus;
@@ -178,31 +192,50 @@ exports.getSubmissionList = async (req, res, next) => {
   if (!count) count = 16;
 
   // validation
-  if (!token || token == '') return res.json({ status: 400, msg: 'Empty token !' });
+  if (!token || token == "")
+    return res.json({ status: 400, msg: "Empty token !" });
 
   // logic
   var loggedAdmin = await AuthModule.getAdminFromToken(token);
-  if (!loggedAdmin) return res.json({ status: 400, msg: 'token is not valid !' });
+  if (!loggedAdmin)
+    return res.json({ status: 400, msg: "token is not valid !" });
 
   var cond = approvalStatus ? { approvalStatus } : {};
-  var submissions = await UserModel.find(cond).sort({ updatedAt: 1, approvalStatus: -1 }).skip(offset).limit(count);
+  var submissions = await UserModel.find(cond)
+    .sort({ updatedAt: 1, approvalStatus: -1 })
+    .skip(offset)
+    .limit(count);
   var total = await UserModel.find(cond).count();
-  return res.json({ status: 200, msg: 'success', data: { total, submissions } });
-};
 
+  // add date diff
+  var curDate = Date.now();
+  var result = [];
+  if (submissions && submissions.length > 0) {
+    for (let i = 0; i < submissions.length; i++) {
+      var item = JSON.parse(JSON.stringify(submissions[i]));
+      item.time_diff = curDate - submissions[i].updatedAt;
+      result.push(item);
+    }
+  }
+  return res.json({
+    status: 200,
+    msg: "success",
+    data: { total, result }
+  });
+};
 
 /**
  * @function: Get user documents
- * 
+ *
  * @method: GET /userdocuments
- * 
+ *
  * @param {String|Required} token
  * @param {String|Required} useremail
  * @param {String} type
- * 
+ *
  * @return
  * { "status": 200, "msg": "success", data: [{documentType: base64_image}] }
-*/
+ */
 exports.getUserDocuments = async (req, res) => {
   const gfs = req.app.get("gfs");
 
@@ -212,24 +245,28 @@ exports.getUserDocuments = async (req, res) => {
 
   var docTypes = [];
   // validation
-  if (!token || token == '') return res.json({ status: 400, msg: 'Empty token !' });
-  if (!UtilsModule.validateEmail(useremail)) return res.json({ status: 400, msg: 'Invalid user email !' });
-  if (type == 'selfie' || type == 'identityDocument') docTypes = [type];
-  else docTypes = ['identityDocument', 'selfie'];
+  if (!token || token == "")
+    return res.json({ status: 400, msg: "Empty token !" });
+  if (!UtilsModule.validateEmail(useremail))
+    return res.json({ status: 400, msg: "Invalid user email !" });
+  if (type == "selfie" || type == "identityDocument") docTypes = [type];
+  else docTypes = ["identityDocument", "selfie"];
 
   // logic
   var loggedAdmin = await AuthModule.getAdminFromToken(token);
-  if (!loggedAdmin) return res.json({ status: 400, msg: 'token is not valid !' });
+  if (!loggedAdmin)
+    return res.json({ status: 400, msg: "token is not valid !" });
 
   try {
     var userRow = await UserModel.findOne({ email: useremail });
-    if (!userRow) return res.json({ status: 400, msg: 'Not existing user email !' });
+    if (!userRow)
+      return res.json({ status: 400, msg: "Not existing user email !" });
 
     var documents = [];
     for (let i = 0; i < docTypes.length; i++) {
       var key = docTypes[i];
       var filename = userRow[key];
-      if (!filename || filename == '') continue;
+      if (!filename || filename == "") continue;
 
       try {
         var file = await UtilsModule.getImageDataFromGrid(gfs, filename);
@@ -238,26 +275,26 @@ exports.getUserDocuments = async (req, res) => {
           item[key] = file;
           documents.push(item);
         }
-      } catch (error) { }
+      } catch (error) {}
     }
 
-    return res.json({ status: 200, msg: 'success', data: documents });
+    return res.json({ status: 200, msg: "success", data: documents });
   } catch (error) {
-    console.log({ error })
-    return res.json({ status: 400, msg: 'Error !', data: error });
+    console.log({ error });
+    return res.json({ status: 400, msg: "Error !", data: error });
   }
-}
+};
 
 /**
  * @function: Update user's identity document
- * 
+ *
  * @method: POST /update/identity
- * 
+ *
  * @param {String|Required} token
  * @param {String|Required} useremail
  * @param {String|Required} documentType
  * @param {String|Required} identityDocument
- * 
+ *
  * @returns { status: 200, msg: "success", data: userRow }
  */
 exports.postUpdateIdentity = async (req, res) => {
@@ -275,19 +312,22 @@ exports.postUpdateIdentity = async (req, res) => {
 
   // logic
   var loggedAdmin = await AuthModule.getAdminFromToken(token);
-  if (!loggedAdmin) return res.json({ status: 400, msg: 'token is not valid !' });
+  if (!loggedAdmin)
+    return res.json({ status: 400, msg: "token is not valid !" });
 
   try {
     var userRow = await UserModel.findOne({ email: useremail });
     if (!userRow) return res.json({ status: 400, msg: "No existing user !" });
 
     // save file
-    var filename = `identityDocument-${Date.now()}.${UtilsModule.getImageExt(identityDocument)}`;
+    var filename = `identityDocument-${Date.now()}.${UtilsModule.getImageExt(
+      identityDocument
+    )}`;
     UtilsModule.saveImagetoGrid(gfs, filename, identityDocument);
     // Add user
     userRow.set({
       documentType: documentType || userRow.documentType,
-      identityDocument: filename,
+      identityDocument: filename
     });
 
     userRow.save(err => {
@@ -303,13 +343,13 @@ exports.postUpdateIdentity = async (req, res) => {
 
 /**
  * @function: Update user's selfie
- * 
+ *
  * @method: POST /update/selfie
- * 
+ *
  * @param {String|Required} token
  * @param {String|Required} useremail
  * @param {String|Required} selfie
- * 
+ *
  * @returns { status: 200, msg: "success", data: userRow }
  */
 exports.postUpdateSelfie = async (req, res) => {
@@ -325,7 +365,8 @@ exports.postUpdateSelfie = async (req, res) => {
 
   // logic
   var loggedAdmin = await AuthModule.getAdminFromToken(token);
-  if (!loggedAdmin) return res.json({ status: 400, msg: 'token is not valid !' });
+  if (!loggedAdmin)
+    return res.json({ status: 400, msg: "token is not valid !" });
 
   try {
     var userRow = await UserModel.findOne({ email: useremail });
@@ -336,7 +377,7 @@ exports.postUpdateSelfie = async (req, res) => {
     UtilsModule.saveImagetoGrid(gfs, filename, selfie);
     // Add user
     userRow.set({
-      selfie: filename,
+      selfie: filename
     });
 
     userRow.save(err => {
