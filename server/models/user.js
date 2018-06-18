@@ -23,8 +23,7 @@ var userSchema = new Schema(
     documentType: {
       type: String,
       enum: ['PASSPORT', 'IDCARD'],
-      // default: "PASSPORT"
-      default: ""
+      default: "PASSPORT",
     },
     identityDocument: String, // photo in blobstore
 

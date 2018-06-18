@@ -44,9 +44,7 @@ passport.use(
 passport.use(
   "user",
   new LocalStrategy({ usernameField: "email" }, (email, password, done) => {
-console.log({email, password})    
     UserModel.findOne({ email: email.toLowerCase() }, (err, user) => {
-console.log({user, err})      
       if (err) {
         return done(err);
       }
@@ -54,7 +52,6 @@ console.log({user, err})
         return done(null, false, { msg: `Invalid email !` });
       }
       user.comparePassword(password, (err, isMatch) => {
-        console.log({err, isMatch})
         if (err) {
           return done(err);
         }

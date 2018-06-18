@@ -12,10 +12,10 @@ var should = chai.should();
 chai.use(chaiHttp);
 
 describe("Global API test", function() {
-  it("should get all coins GET", function(done) {
+  it("should get all countries", function(done) {
     chai
       .request(server)
-      .get("/global/coins")
+      .get("/global/countries")
       .end(function(err, response) {
         response.should.have.status(200);
         response.should.be.json;
@@ -24,14 +24,3 @@ describe("Global API test", function() {
       });
   });
 });
-
-// describe("global controller test: Status and content", function() {
-//   describe("Get Coins", function() {
-//     it("status", function(done) {
-//       request("http://localhost:3000/global/coins", function(error, response, body) {
-//         expect(response.statusCode).to.equal(200);
-//         done();
-//       });
-//     });
-//   });
-// });

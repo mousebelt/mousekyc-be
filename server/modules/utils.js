@@ -53,13 +53,14 @@ function getImageExt(base64_data) {
 }
 exports.getImageExt = getImageExt;
 
-exports.saveImagetoGrid = (gfs, filename, data) => {
+exports.saveImagetoGrid = (gfs, filename, base64_data) => {
   var metadata
   try {
     metadata = base64_data.split(";")[0];
   } catch (error) {}
 
-  var filepath = base64Img.imgSync(data, "./uploads", filename);
+  console.log({metadata});
+  var filepath = base64Img.imgSync(base64_data, "./uploads", filename);
 
   var writestream = gfs.createWriteStream({ filename, metadata: metadata });
   fs.createReadStream(filepath)
