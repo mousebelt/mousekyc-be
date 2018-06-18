@@ -35,7 +35,6 @@ exports.getImageDataFromGrid = async (gfs, filename) => {
         });
     });
   } catch (error) {
-    console.log({ error });
     reject(error);
   }
 }

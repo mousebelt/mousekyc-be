@@ -224,6 +224,52 @@ exports.getSubmissionList = async (req, res, next) => {
   });
 };
 
+exports.getSubmissionByMail = async (req, res, next) => {
+  const gfs = req.app.get("gfs");
+  
+  var token = req.query.token;
+  var useremail = req.params.useremail;
+
+  // validation
+  if (!token || token == "")
+    return res.json({ status: 400, msg: "Empty token !" });
+  if (!UtilsModule.validateEmail(useremail))
+    return res.json({ status: 400, msg: "Invalid user email !" });
+
+  // logic
+  var loggedAdmin = await AuthModule.getAdminFromToken(token);
+  if (!loggedAdmin)
+    return res.json({ status: 400, msg: "token is not valid !" });
+
+  var user = await UserModel.findOne({ email: useremail });
+  if (!user) return res.json({ status: 400, msg: "Not found submission !" });
+
+  // add date diff
+  var curDate = Date.now();
+
+  var info = JSON.parse(JSON.stringify(user));
+  info.time_diff = curDate - user.updatedAt;
+
+  if (user.identityDocument && user.identityDocument != '') {
+    try {
+      var identityDocument = await UtilsModule.getImageDataFromGrid(gfs, user.identityDocument);
+      if (identityDocument) info.identityDocument = identityDocument;
+    } catch (error) { }
+  }
+  if (user.selfie && user.selfie != '') {
+    try {
+      var selfie = await UtilsModule.getImageDataFromGrid(gfs, user.selfie);
+      if (selfie) info.selfie = selfie;
+    } catch (error) { }
+  }
+
+  return res.json({
+    status: 200,
+    msg: "success",
+    data: info
+  });
+};
+
 /**
  * @function: Get user documents
  *
@@ -275,7 +321,7 @@ exports.getUserDocuments = async (req, res) => {
           item[key] = file;
           documents.push(item);
         }
-      } catch (error) {}
+      } catch (error) { }
     }
 
     return res.json({ status: 200, msg: "success", data: documents });
