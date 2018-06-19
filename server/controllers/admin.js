@@ -184,6 +184,7 @@ exports.postApproveUser = async (req, res, next) => {
  */
 exports.getSubmissionList = async (req, res, next) => {
   var token = req.query.token;
+  var useremail = req.query.useremail;
   var approvalStatus = req.query.approvalStatus;
   var offset = Number(req.query.offset);
   var count = Number(req.query.count);
@@ -201,6 +202,8 @@ exports.getSubmissionList = async (req, res, next) => {
     return res.json({ status: 400, msg: "token is not valid !" });
 
   var cond = approvalStatus ? { approvalStatus } : {};
+  if (useremail && useremail != '') cond.email = { "$regex": `${useremail}`, "$options": "i" };
+
   var submissions = await UserModel.find(cond)
     .sort({ updatedAt: 1, approvalStatus: -1 })
     .skip(offset)
@@ -221,52 +224,6 @@ exports.getSubmissionList = async (req, res, next) => {
     status: 200,
     msg: "success",
     data: { total, result }
-  });
-};
-
-exports.getSubmissionByMail = async (req, res, next) => {
-  const gfs = req.app.get("gfs");
-  
-  var token = req.query.token;
-  var useremail = req.params.useremail;
-
-  // validation
-  if (!token || token == "")
-    return res.json({ status: 400, msg: "Empty token !" });
-  if (!UtilsModule.validateEmail(useremail))
-    return res.json({ status: 400, msg: "Invalid user email !" });
-
-  // logic
-  var loggedAdmin = await AuthModule.getAdminFromToken(token);
-  if (!loggedAdmin)
-    return res.json({ status: 400, msg: "token is not valid !" });
-
-  var user = await UserModel.findOne({ email: useremail });
-  if (!user) return res.json({ status: 400, msg: "Not found submission !" });
-
-  // add date diff
-  var curDate = Date.now();
-
-  var info = JSON.parse(JSON.stringify(user));
-  info.time_diff = curDate - user.updatedAt;
-
-  if (user.identityDocument && user.identityDocument != '') {
-    try {
-      var identityDocument = await UtilsModule.getImageDataFromGrid(gfs, user.identityDocument);
-      if (identityDocument) info.identityDocument = identityDocument;
-    } catch (error) { }
-  }
-  if (user.selfie && user.selfie != '') {
-    try {
-      var selfie = await UtilsModule.getImageDataFromGrid(gfs, user.selfie);
-      if (selfie) info.selfie = selfie;
-    } catch (error) { }
-  }
-
-  return res.json({
-    status: 200,
-    msg: "success",
-    data: info
   });
 };
 
