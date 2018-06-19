@@ -58,7 +58,6 @@ exports.saveImagetoGrid = (gfs, filename, base64_data) => {
     metadata = base64_data.split(";")[0];
   } catch (error) {}
 
-  console.log({metadata});
   var filepath = base64Img.imgSync(base64_data, "./uploads", filename);
 
   var writestream = gfs.createWriteStream({ filename, metadata: metadata });
