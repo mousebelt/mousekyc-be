@@ -1,3 +1,4 @@
+const dateFormat = require("dateformat");
 const base64Img = require("base64-img");
 const bluebird = require("bluebird");
 const crypto = bluebird.promisifyAll(require("crypto"));
@@ -218,6 +219,8 @@ exports.getSubmissionList = async (req, res, next) => {
     for (let i = 0; i < submissions.length; i++) {
       var item = JSON.parse(JSON.stringify(submissions[i]));
       item.time_diff = curDate - submissions[i].updatedAt;
+      item.dob = dateFormat(item.dob, "yyyy-mm-dd");
+      item.documentExpireDate = dateFormat(item.documentExpireDate, "yyyy-mm-dd HH:MM:ss");
       result.push(item);
     }
   }
