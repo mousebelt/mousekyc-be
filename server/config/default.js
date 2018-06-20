@@ -1,7 +1,7 @@
 const config = {
   port: 3000,
-  db: 'mongodb://mongo:27017/kyc-db',
-  // db: 'mongodb://localhost:27017/kyc-db',
+  // db: 'mongodb://mongo:27017/kyc-db',
+  db: 'mongodb://localhost:27017/kyc-db',
   email: {
     domain: 'mail.norestlabs.com',
     mailgun: {

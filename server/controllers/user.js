@@ -87,7 +87,16 @@ exports.postGenToken = async (req, res, next) => {
 
       var token = AuthModule.makeUserLoginToken(user._id, { expiresIn: "7d" });
       res.set("authorization", token);
-      res.json({ status: 200, msg: "success", data: { token } });
+      return res.json({
+        status: 200,
+        msg: "success",
+        data: {
+          email: user.email,
+          token,
+          approvalStatus: user.approvalStatus,
+          approvalDescription: user.approvalDescription
+        }
+      });
     });
   })(req, res, next);
 };
@@ -227,7 +236,6 @@ exports.postUpdateIdentity = async (req, res) => {
     userRow.set({
       documentType,
       identityDocument: filename
-      // approvalStatus: "PENDING"
     });
 
     userRow.save(err => {
@@ -279,7 +287,8 @@ exports.postUpdateSelfie = async (req, res) => {
     // Add user
     userRow.set({
       selfie: filename,
-      approvalStatus: "PENDING"
+      approvalStatus: "PENDING",
+      approvalDescription: undefined
     });
 
     userRow.save(err => {

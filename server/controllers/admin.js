@@ -143,6 +143,7 @@ exports.postApproveUser = async (req, res, next) => {
   var approvalStatus = req.body.approvalStatus;
   var approvalDescription = req.body.approvalDescription;
 
+  if (approvalStatus != 'ACTION_REQUESTED') approvalDescription = undefined;
   // validation
   if (!token || token == "")
     return res.json({ status: 400, msg: "Empty token !" });
