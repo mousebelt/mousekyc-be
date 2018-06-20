@@ -8,18 +8,16 @@ const config = {
       public: 'pubkey-c34e8a067ae814f5efdb8a6ac6631ca5',
       private: '618dc03859a470f79b02cce432d679ad-47317c98-64c69d9d'
     },
-    sendgrid: {
-      USER: "ohtayoshida",
-      PASS: "sendgrid123"
-    },
+    masterEmail: "galen@norestlabs.com",
     from: {
       general: "hello@norestlabs.com",
-      //   referral: EMAIL_REFERRAL || 'partners@icodashboard.space'
     },
     template: {
       folder: 'default',
     }
   },
+  apiRootUrl: 'http://54.152.190.110:3000',
+  project: 'NRL-KYC'
 }
 
 module.exports = config;
