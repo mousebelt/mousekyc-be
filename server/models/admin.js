@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt-nodejs');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
+const constants = require('./constants');
 
 var Schema = mongoose.Schema;
 
@@ -21,10 +22,12 @@ var adminSchema = new Schema({
   address: String,
   zipcode: String,
 
-  deactivated: {
-    type: Boolean,
-    default: false
+  status: {
+    type: String,
+    default: constants.ADMIN_STATUS_NOT_VERIFIED
   },
+  ownerConfirmToken: String,
+
   updatedAt: Date
 }, { timestamps: true });
 

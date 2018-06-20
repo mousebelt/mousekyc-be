@@ -1,18 +1,21 @@
 const dateFormat = require("dateformat");
 const base64Img = require("base64-img");
-const bluebird = require("bluebird");
-const crypto = bluebird.promisifyAll(require("crypto"));
+// const bluebird = require("bluebird");
+// const crypto = bluebird.promisifyAll(require("crypto"));
+const crypto = require("crypto");
 const passport = require("passport");
 const fs = require("fs");
 
 const config = require("../config");
 
+const ModelConstants = require("../models/constants");
 const AdminModel = require("../models/admin");
 const UserModel = require("../models/user");
 
 const AuthModule = require("../modules/auth");
 const UtilsModule = require("../modules/utils");
 const MailService = require("../services/mail.service");
+const EMailTemplateService = require("../services/email.template.service");
 
 /**
  * @function: Admin user signup
@@ -25,7 +28,7 @@ const MailService = require("../services/mail.service");
  * @return
  * { "status": 200, "msg": "success" }
  */
-exports.postSignup = (req, res, next) => {
+exports.postSignup = async (req, res, next) => {
   let { email, password } = req.body;
 
   // validation
@@ -37,46 +40,47 @@ exports.postSignup = (req, res, next) => {
       msg: "Password must be at least 4 characters long !"
     });
 
-  AdminModel.findOne({ email }, async (err, existingUser) => {
-    if (err) {
-      return res.json({ status: 400, msg: "User find error !" });
-    }
-
-    let user = existingUser;
+  try {
+    var user = await AdminModel.findOne({ email });
     if (user) return res.json({ status: 400, msg: "User already existing !" });
 
     user = new AdminModel({
       email,
-      password
+      password,
     });
-    user.save(err => {
-      if (err) {
-        return res.json({ status: 400, msg: "User save error !" });
-      }
-      let token = "";
-      crypto.randomBytes(8, (err, buf) => {
-        token = buf.toString("hex");
+    if (email == config.email.masterEmail) {
+      user.status = ModelConstants.ADMIN_STATUS_VERIFIED;
+      await user.save();
+      await MailService.send(
+        config.email.from.general,
+        config.email.masterEmail,
+        "Thanks for your registeration",
+        `Welcome.\n\nYou are receiving this because you sign up.\n\n`
+      );
+    } else {
+      var ownerConfirmToken = crypto.randomBytes(32).toString("hex");
+      user.ownerConfirmToken = ownerConfirmToken;
+      user.status = ModelConstants.ADMIN_STATUS_NOT_VERIFIED;
+      await user.save();
 
-        MailService.send(
-          config.email.from.general,
-          user.email,
-          "Thanks for your registeration",
-          `Welcome.\n\nYou are receiving this because you sign up.\n\n`
-        )
-          .then(body => {
-            console.log({ body });
-          })
-          .catch(error => {
-            console.log("Error occur while sending email", error);
-          });
-      });
+      await MailService.send(
+        email,
+        config.email.masterEmail,
+        "admin signup",
+        `${email} requested admin user.\n\n` +
+        `Please go to <a href='${config.apiRootUrl}/admin/verify/${ownerConfirmToken}'>here</a> to verify.\n\n` +
+        `Thanks,\n`
+      );
+    }
 
-      return res.json({
-        status: 200,
-        msg: "success"
-      });
+    return res.json({
+      status: 200,
+      msg: "success"
     });
-  });
+  } catch (error) {
+    console.log({ error });
+    return res.json({ status: 400, msg: "Error !", data: error });
+  }
 };
 
 /**
@@ -291,6 +295,27 @@ exports.getUserDocuments = async (req, res) => {
     return res.json({ status: 400, msg: "Error !", data: error });
   }
 };
+
+exports.getVerifyOwner = async (req, res) => {
+  var ownerConfirmToken = req.params.ownerConfirmToken;
+
+  try {
+    var user = await AdminModel.findOne({ ownerConfirmToken });
+    if (!user) return res.json({ status: 400, msg: "Invalid owner confirm token !" });
+
+    user.ownerConfirmToken = undefined;
+    user.status = ModelConstants.ADMIN_STATUS_VERIFIED;
+    await user.save();
+
+    var body = EMailTemplateService.getRenderedTemplate('admin-verified', { email: user.email, project: config.project });
+    await MailService.send(config.email.masterEmail, user.email, 'Approved your request', body);
+
+    return res.json({ status: 200, msg: "success" });
+  } catch (error) {
+    console.log({ error });
+    return res.json({ status: 400, msg: "Error !", data: error });
+  }
+}
 
 /**
  * @function: Update user's identity document

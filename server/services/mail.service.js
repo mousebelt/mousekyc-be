@@ -1,7 +1,7 @@
 const mailcomposer = require("mailcomposer");
 const config = require("../config");
 
-exports.send = (from, to, subject, text) => {
+function send (from, to, subject, text) {
   const mailgun = require('mailgun-js')({ apiKey: config.email.mailgun.private, domain: config.email.domain });
   // const mailOptions = {
   //   from,
@@ -36,3 +36,4 @@ exports.send = (from, to, subject, text) => {
     });
   });
 };
+exports.send = send;

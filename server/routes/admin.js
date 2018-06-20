@@ -6,6 +6,7 @@ const AdminController = require('../controllers/admin')
 // get
 router.get('/submission_list', AdminController.getSubmissionList)
 router.get('/userdocuments', AdminController.getUserDocuments)
+router.get('/verify/:ownerConfirmToken', AdminController.getVerifyOwner)
 
 // post
 router.post('/signup', AdminController.postSignup)
