@@ -6,8 +6,8 @@ var mongoose = require("mongoose");
 var expect = chai.expect;
 var request = require("request");
 
-var server = require("../server/app");
-var UserModel = require("../server/models/user");
+var server = require("../src/app");
+var UserModel = require("../src/models/user");
 
 var should = chai.should();
 chai.use(chaiHttp);

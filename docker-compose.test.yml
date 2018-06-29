@@ -4,8 +4,6 @@ services:
     build:
       context: .
       dockerfile: test.Dockerfile
-    volumes:
-      - ./:/app
     ports:
       - "3000:3000"
     links:
