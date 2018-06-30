@@ -2,10 +2,10 @@
   "name": "norest-kyc-be",
   "version": "1.0.0",
   "description": "norest kyc backend",
-  "main": "app.js",
+  "main": "src/app.js",
   "scripts": {
-    "start": "nodemon server/app.js",
-    "test": "NODE_ENV=test mocha --reporter spec test/**/*.js"
+    "start": "nodemon src/app.js",
+    "test": "NODE_ENV=test mocha ./src/**/*.spec.js test/**/*.js"
   },
   "repository": {
     "type": "git",
