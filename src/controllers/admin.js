@@ -29,7 +29,8 @@ const EMailTemplateService = require("../services/email.template.service");
  * { "status": 200, "msg": "success" }
  */
 exports.postSignup = async (req, res, next) => {
-  let { email, password } = req.body;
+  var email = String(req.body.email).toLowerCase();
+  let { password } = req.body;
 
   // validation
   if (!UtilsModule.validateEmail(email))
@@ -95,7 +96,8 @@ exports.postSignup = async (req, res, next) => {
  * { "status": 200, "msg": "success", data: { token } }
  */
 exports.postLogin = (req, res, next) => {
-  var { email, password } = req.body;
+  var email = String(req.body.email).toLowerCase();
+  var { password } = req.body;
 
   // validation
   if (!UtilsModule.validateEmail(email))
@@ -144,7 +146,7 @@ exports.postLogin = (req, res, next) => {
  */
 exports.postApproveUser = async (req, res, next) => {
   var token = req.body.token;
-  var useremail = req.body.useremail;
+  var useremail = String(req.body.useremail).toLowerCase();
   var approvalStatus = req.body.approvalStatus;
   var approvalDescription = req.body.approvalDescription;
 
@@ -190,7 +192,7 @@ exports.postApproveUser = async (req, res, next) => {
  */
 exports.getSubmissionList = async (req, res, next) => {
   var token = req.query.token;
-  var useremail = req.query.useremail;
+  var useremail = String(req.query.useremail).toLowerCase();
   var approvalStatus = req.query.approvalStatus;
   var offset = Number(req.query.offset);
   var count = Number(req.query.count);
@@ -251,7 +253,7 @@ exports.getUserDocuments = async (req, res) => {
   const gfs = req.app.get("gfs");
 
   var token = req.query.token;
-  var useremail = req.query.useremail;
+  var useremail = String(req.query.useremail).toLowerCase();
   var type = req.query.type;
 
   var docTypes = [];
@@ -331,7 +333,9 @@ exports.getVerifyOwner = async (req, res) => {
  */
 exports.postUpdateIdentity = async (req, res) => {
   const gfs = req.app.get("gfs");
-  var { useremail, token, documentType, identityDocument } = req.body;
+
+  var useremail = String(req.body.useremail).toLowerCase();
+  var { token, documentType, identityDocument } = req.body;
 
   if (!UtilsModule.validateEmail(useremail))
     return res.json({ status: 400, msg: "Invalid email !" });
@@ -386,7 +390,9 @@ exports.postUpdateIdentity = async (req, res) => {
  */
 exports.postUpdateSelfie = async (req, res) => {
   const gfs = req.app.get("gfs");
-  var { useremail, token, selfie } = req.body;
+
+  var useremail = String(req.body.useremail).toLowerCase();
+  var { token, selfie } = req.body;
 
   if (!UtilsModule.validateEmail(useremail))
     return res.json({ status: 400, msg: "Invalid user email !" });
