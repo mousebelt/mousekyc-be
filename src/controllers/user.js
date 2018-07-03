@@ -56,6 +56,11 @@ exports.getInfoToken = async (req, res) => {
  */
 exports.postGenToken = async (req, res, next) => {
   var email = String(req.body.email).toLowerCase();
+  var apiKey = String(req.body.apiKey);
+
+  if (!UtilsModule.checkApiKey(apiKey))
+    return res.json({ status: 400, msg: "Invalid API Key !" });
+
   if (!UtilsModule.validateEmail(email))
     return res.json({ status: 400, msg: "Invalid email !" });
 

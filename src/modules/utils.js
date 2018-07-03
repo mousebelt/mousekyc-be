@@ -1,9 +1,17 @@
 const fs = require("fs");
 const base64Img = require("base64-img");
+const config = require("../config");
 
 exports.validateEmail = email => {
   var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
+};
+
+exports.checkApiKey = apiKey => {
+  if (config.demoMode) return true;
+  if (config.API_KEY == apiKey) return true;
+  
+  return false;
 };
 
 async function getInfoFromGrid(gfs, filename) {

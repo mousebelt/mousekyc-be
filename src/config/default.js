@@ -17,7 +17,10 @@ const config = {
     }
   },
   apiRootUrl: 'http://54.152.190.110:3000',
-  project: 'NRL-KYC'
+  project: 'NRL-KYC',
+
+  demoMode: false,
+  API_KEY: 'apikey-1234567890'
 }
 
 module.exports = config;
