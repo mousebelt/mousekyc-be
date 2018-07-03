@@ -55,7 +55,7 @@ exports.getInfoToken = async (req, res) => {
  * { "status": 200, "msg": "success", data: { token } }
  */
 exports.postGenToken = async (req, res, next) => {
-  var email = String(req.body.email);
+  var email = String(req.body.email).toLowerCase();
   if (!UtilsModule.validateEmail(email))
     return res.json({ status: 400, msg: "Invalid email !" });
 
