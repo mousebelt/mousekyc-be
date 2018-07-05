@@ -20,7 +20,8 @@ const config = {
   project: 'NRL-KYC',
 
   demoMode: false,
-  API_KEY: 'apikey-1234567890'
+  API_KEY: 'apikey-1234567890',
+  FRONTEND_URL: 'http://54.152.190.110'
 }
 
 module.exports = config;
