@@ -4,6 +4,7 @@ const userController = require('../controllers/user');
 
 // get
 router.get('/info/:token', userController.getInfoToken);
+router.get('/passport/info/:token', userController.getPassportInfo);
 
 // post
 router.post('/gentoken', userController.postGenToken);

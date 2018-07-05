@@ -69,7 +69,7 @@ exports.postSignup = async (req, res, next) => {
         config.email.masterEmail,
         "admin signup",
         `${email} requested admin user.\n\n` +
-        `Please go to <a href='${config.apiRootUrl}/admin/verify/${ownerConfirmToken}'>here</a> to verify.\n\n` +
+        `Please go to <a href='${config.baseUrl}/admin/verify/${ownerConfirmToken}'>here</a> to verify.\n\n` +
         `Thanks,\n`
       );
     }

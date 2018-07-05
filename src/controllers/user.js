@@ -4,15 +4,13 @@ const base64Img = require("base64-img");
 const fs = require("fs");
 
 const config = require("../config");
-var UserModel = require("../models/user");
+const UserModel = require("../models/user");
+const PassportInfoModel = require("../models/passportInfo");
 const UtilsModule = require("../modules/utils");
 const MailService = require("../services/mail.service");
 
 exports.getInfoToken = async (req, res) => {
   var token = req.params.token;
-
-  if (!token || token == "")
-    return res.json({ status: 400, msg: "Empty token !" });
 
   var user = await UserModel.findOne({ token });
   if (!user) return res.json({ status: 400, msg: "token is not valid !" });
@@ -29,6 +27,32 @@ exports.getInfoToken = async (req, res) => {
   });
 };
 
+exports.getPassportInfo = async (req, res) => {
+  var token = req.params.token;
+
+  var user = await UserModel.findOne({ token });
+  if (!user) return res.json({ status: 400, msg: "Not found user !" });
+  if (!user.identityDocument) return res.json({ status: 400, msg: "Not existing identity document !" });
+
+  var piRow = await PassportInfoModel.findOne({ filename: user.identityDocument });
+  if (!piRow) return res.json({ status: 400, msg: "Not verified yet !" });
+
+  return res.json({
+    status: 200,
+    msg: "success",
+    data: {
+      firstname: piRow.firstname,
+      lastname: piRow.lastname,
+      dob: piRow.dob,
+      documentExpireDate: piRow.documentExpireDate,
+      nationalityCountry: piRow.nationalityCountry, // Country code
+      documentId: piRow.documentId,
+      filename: piRow.filename,
+      created: piRow.created,
+    }
+  });
+};
+
 exports.postGenToken = async (req, res, next) => {
   var email = String(req.body.email).toLowerCase();
   var apiKey = String(req.body.apiKey);
@@ -39,47 +63,34 @@ exports.postGenToken = async (req, res, next) => {
   if (!UtilsModule.validateEmail(email))
     return res.json({ status: 400, msg: "Invalid email !" });
 
-  UserModel.findOne({ email }, (err, user) => {
-    if (err)
-      return res.json({
-        status: 400,
-        msg: "DB error !"
-      });
-
-    if (!user) {
+  try {
+    var userRow = await UserModel.findOne({ email });
+    if (!userRow) {
       var token = uuidv1(); // '45745c60-7b1a-11e8-9c9c-2d42b21b1a3e'
-      var callbackUrl = `${config.FRONTEND_URL}/?token=${token}`;
       var tokenExpire = Date.now() + 24 * 3600 * 60;
-      user = new UserModel({ email, token, tokenExpire });
-      user.save(err => {
-        if (err)
-          return res.json({
-            status: 400,
-            msg: "User save error !"
-          });
-
-        return res.json({
-          status: 200,
-          msg: "success",
-          data: {
-            token,
-            callbackUrl
-          }
-        });
-      });
-    } else {
-      var token = user.token;
-      var callbackUrl = `${config.FRONTEND_URL}/?token=${token}`;
-      return res.json({
-        status: 200,
-        msg: "success",
-        data: {
-          token,
-          callbackUrl
-        }
-      });
+      userRow = new UserModel({ email, token, tokenExpire });
+      await userRow.save();
     }
-  });
+
+    return res.json({
+      status: 200,
+      msg: "success",
+      data: {
+        token: userRow.token,
+        frontendUrl: UtilsModule.getFrontendUrl(token),
+        passportInfoUrl: UtilsModule.getPassportInfoUrl(token),
+        statusInfoUrl: UtilsModule.getStatusInfoUrl(token),
+        baseUrl: UtilsModule.getBaseUrl(),
+        timestamp: Date.now()
+      }
+    });
+  } catch (error) {
+    return res.json({
+      status: 400,
+      msg: "DB error !",
+      data: error
+    });
+  }
 };
 
 /**

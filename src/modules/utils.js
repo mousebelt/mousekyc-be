@@ -14,6 +14,22 @@ exports.checkApiKey = apiKey => {
   return false;
 };
 
+exports.getFrontendUrl = token => {
+  return `${config.frontendBaseUrl}/?token=${token}`;
+};
+
+exports.getPassportInfoUrl = token => {
+  return `${config.baseUrl}/user/passport/info/${token}`;
+};
+
+exports.getStatusInfoUrl = token => {
+  return `${config.baseUrl}/user/info/${token}`;
+};
+
+exports.getBaseUrl = () => {
+  return `${config.baseUrl}`;
+};
+
 async function getInfoFromGrid(gfs, filename) {
   return new Promise((resolve, reject) => {
     gfs.files.findOne({ filename }, function (err, file) {

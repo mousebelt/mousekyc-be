@@ -16,12 +16,12 @@ const config = {
       folder: 'default',
     }
   },
-  apiRootUrl: 'http://54.152.190.110:3000',
   project: 'NRL-KYC',
 
   demoMode: false,
   API_KEY: 'apikey-1234567890',
-  FRONTEND_URL: 'http://54.152.190.110'
+  frontendBaseUrl: 'http://54.152.190.110',
+  baseUrl: 'http://54.152.190.110:3000',
 }
 
 module.exports = config;

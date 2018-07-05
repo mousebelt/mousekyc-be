@@ -1,5 +1,3 @@
-const bcrypt = require('bcrypt-nodejs');
-const crypto = require('crypto');
 const mongoose = require('mongoose');
 
 var Schema = mongoose.Schema;
@@ -44,8 +42,7 @@ var userSchema = new Schema(
     backgroundCheckId: String,
     created: Date,
     updatedAt: Date
-  },
-  { timestamps: true }
+  }
 );
 
 /**
@@ -54,6 +51,7 @@ var userSchema = new Schema(
 userSchema.pre('save', function save(next) {
   const user = this;
   user.updatedAt = Date.now();
+  next();
 });
 
 const User = mongoose.model("User", userSchema);
