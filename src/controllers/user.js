@@ -55,35 +55,86 @@ exports.getPassportInfo = async (req, res) => {
 
 exports.postGenToken = async (req, res, next) => {
   var email = String(req.body.email).toLowerCase();
-  var apiKey = String(req.body.apiKey);
-
-  if (!UtilsModule.checkApiKey(apiKey))
-    return res.json({ status: 400, msg: "Invalid API Key !" });
 
   if (!UtilsModule.validateEmail(email))
     return res.json({ status: 400, msg: "Invalid email !" });
 
   try {
+    var token;
     var userRow = await UserModel.findOne({ email });
     if (!userRow) {
-      var token = uuidv1(); // '45745c60-7b1a-11e8-9c9c-2d42b21b1a3e'
+      token = uuidv1(); // '45745c60-7b1a-11e8-9c9c-2d42b21b1a3e'
       var tokenExpire = Date.now() + 24 * 3600 * 60;
       userRow = new UserModel({ email, token, tokenExpire });
       await userRow.save();
+    } else {
+      token = userRow.token;
     }
 
     return res.json({
       status: 200,
       msg: "success",
       data: {
-        token: userRow.token,
-        frontendUrl: UtilsModule.getFrontendUrl(token),
-        passportInfoUrl: UtilsModule.getPassportInfoUrl(token),
-        statusInfoUrl: UtilsModule.getStatusInfoUrl(token),
-        baseUrl: UtilsModule.getBaseUrl(),
-        timestamp: Date.now()
-      }
+        email,
+        token,
+        approvalStatus: user.approvalStatus,
+        approvalDescription: user.approvalDescription
+      },
     });
+  } catch (error) {
+    return res.json({
+      status: 400,
+      msg: "DB error !",
+      data: error
+    });
+  }
+};
+
+// kyc integration
+exports.postInit = async (req, res, next) => {
+  var email = String(req.body.email).toLowerCase();
+  var apiKey = String(req.body.apiKey);
+
+  if (!UtilsModule.checkApiKey(apiKey))
+    return res.json({ status: 400, msg: "Invalid API Key !", error: true });
+
+  if (!UtilsModule.validateEmail(email))
+    return res.json({ status: 400, msg: "Invalid email !", error: true });
+
+  try {
+    var token;
+    var userRow = await UserModel.findOne({ email });
+    if (!userRow) {
+      token = uuidv1(); // '45745c60-7b1a-11e8-9c9c-2d42b21b1a3e'
+      var tokenExpire = Date.now() + 24 * 3600 * 60;
+      userRow = new UserModel({ email, token, tokenExpire });
+      await userRow.save();
+
+      return res.json({
+        status: 200,
+        msg: "success",
+        data: {
+          token,
+          frontendUrl: UtilsModule.getFrontendUrl(token),
+          passportInfoUrl: UtilsModule.getPassportInfoUrl(token),
+          statusInfoUrl: UtilsModule.getStatusInfoUrl(token),
+          baseUrl: UtilsModule.getBaseUrl(),
+        },
+      });
+    } else {
+      token = userRow.token;
+      return res.json({
+        status: 200,
+        msg: "success",
+        data: {
+          token,
+          frontendUrl: UtilsModule.getFrontendUrl(token),
+          passportInfoUrl: UtilsModule.getPassportInfoUrl(token),
+          statusInfoUrl: UtilsModule.getStatusInfoUrl(token),
+          baseUrl: UtilsModule.getBaseUrl(),
+        },
+      });
+    }
   } catch (error) {
     return res.json({
       status: 400,

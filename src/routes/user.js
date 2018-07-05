@@ -12,4 +12,7 @@ router.post('/update', userController.postUpdate);
 router.post('/update/identity', userController.postUpdateIdentity);
 router.post('/update/selfie', userController.postUpdateSelfie);
 
+// kyc integration
+router.post('/init', userController.postInit);
+
 module.exports = router
