@@ -1,7 +1,6 @@
 const config = {
   port: 3000,
   db: 'mongodb://mongo:27017/kyc-db',
-  // db: 'mongodb://localhost:27017/kyc-db',
   email: {
     domain: 'mail.norestlabs.com',
     mailgun: {
@@ -20,8 +19,8 @@ const config = {
 
   demoMode: false,
   API_KEY: 'apikey-1234567890',
-  frontendBaseUrl: 'http://54.152.190.110',
-  baseUrl: 'http://54.152.190.110:3000',
+  frontendBaseUrl: 'https://mousekyc.mousebelt.com',
+  baseUrl: 'https://mousekyc-server.mousebelt.com',
 }
 
 module.exports = config;
