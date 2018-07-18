@@ -1,5 +1,7 @@
 const fs = require("fs");
 const base64Img = require("base64-img");
+const request = require('request');
+const qs = require('querystring');
 const config = require("../config");
 
 exports.validateEmail = email => {
@@ -7,10 +9,13 @@ exports.validateEmail = email => {
   return re.test(String(email).toLowerCase());
 };
 
+/**
+ * third-party integration utils
+ */
 exports.checkApiKey = apiKey => {
   if (config.demoMode) return true;
   if (config.API_KEY == apiKey) return true;
-  
+
   return false;
 };
 
@@ -30,6 +35,22 @@ exports.getBaseUrl = () => {
   return `${config.baseUrl}`;
 };
 
+// Make HTTP Request
+exports.makeHttpRequest = (url, params) => {
+  const options = {
+    'method': 'POST',
+    'headers': {
+      'content-type': 'application/x-www-form-urlencoded'
+    },
+    form: qs.stringify(params)
+  };
+
+  request.post(url, options);
+};
+
+/**
+ * gridfs utils
+ */
 async function getInfoFromGrid(gfs, filename) {
   return new Promise((resolve, reject) => {
     gfs.files.findOne({ filename }, function (err, file) {
@@ -42,7 +63,7 @@ async function getInfoFromGrid(gfs, filename) {
 exports.getImageDataFromGrid = async (gfs, filename) => {
   try {
     info = await getInfoFromGrid(gfs, filename);
-    
+
     return new Promise((resolve, reject) => {
       var rstream = gfs.createReadStream(filename);
       var bufs = [];
@@ -80,7 +101,7 @@ exports.saveImagetoGrid = (gfs, filename, base64_data) => {
   var metadata
   try {
     metadata = base64_data.split(";")[0];
-  } catch (error) {}
+  } catch (error) { }
 
   var filepath = base64Img.imgSync(base64_data, "./uploads", filename);
 
