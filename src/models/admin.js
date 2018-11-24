@@ -1,12 +1,12 @@
 const bcrypt = require('bcrypt-nodejs');
-const crypto = require('crypto');
+// const crypto = require('crypto');
 const mongoose = require('mongoose');
 const constants = require('./constants');
 
-var Schema = mongoose.Schema;
+const Schema = mongoose.Schema;
 
 // create a schema
-var adminSchema = new Schema({
+const adminSchema = new Schema({
   email: { type: String, unique: true },
   password: String,
   passwordResetToken: String,
@@ -38,12 +38,12 @@ adminSchema.pre('save', function save(next) {
   const user = this;
   user.updatedAt = Date.now();
   if (!user.isModified('password')) { return next(); }
-  bcrypt.genSalt(10, (err, salt) => {
+  return bcrypt.genSalt(10, (err, salt) => {
     if (err) { return next(err); }
-    bcrypt.hash(user.password, salt, null, (err, hash) => {
-      if (err) { return next(err); }
+    return bcrypt.hash(user.password, salt, null, (e, hash) => {
+      if (e) { return next(e); }
       user.password = hash;
-      next();
+      return next();
     });
   });
 });

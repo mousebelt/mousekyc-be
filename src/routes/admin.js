@@ -1,19 +1,19 @@
-const express = require('express')
-const router = express.Router()
-const passportController = require('../controllers/passport')
-const AdminController = require('../controllers/admin')
+const express = require('express');
+const router = express.Router();
+// const passportController = require('../controllers/passport');
+const AdminController = require('../controllers/admin');
 
 // get
-router.get('/submission_list', AdminController.getSubmissionList)
-router.get('/userdocuments', AdminController.getUserDocuments)
-router.get('/verify/:ownerConfirmToken', AdminController.getVerifyOwner)
+router.get('/submission_list', AdminController.getSubmissionList);
+router.get('/userdocuments', AdminController.getUserDocuments);
+router.get('/verify/:ownerConfirmToken', AdminController.getVerifyOwner);
 
 // post
-router.post('/signup', AdminController.postSignup)
-router.post('/signin', AdminController.postLogin)
-router.post('/approve_user', AdminController.postApproveUser)
+router.post('/signup', AdminController.postSignup);
+router.post('/signin', AdminController.postLogin);
+router.post('/approve_user', AdminController.postApproveUser);
 
 router.post('/update/identity', AdminController.postUpdateIdentity);
 router.post('/update/selfie', AdminController.postUpdateSelfie);
 
-module.exports = router
+module.exports = router;

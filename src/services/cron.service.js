@@ -1,3 +1,3 @@
 exports.start = function () {
-  console.log('cron started !');
-}
+  console.log('cron started !'); // eslint-disable-line
+};

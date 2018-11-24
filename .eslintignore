@@ -1,0 +1,3 @@
+# test scripts
+/test/*.js
+/src/**/specs/*.spec.js

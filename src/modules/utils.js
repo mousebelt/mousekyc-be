@@ -1,11 +1,11 @@
-const fs = require("fs");
-const base64Img = require("base64-img");
+const fs = require('fs');
+const base64Img = require('base64-img');
 const request = require('request');
 const qs = require('querystring');
-const config = require("../config");
+const config = require('../config');
 
 exports.validateEmail = email => {
-  var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/; // eslint-disable-line
   return re.test(String(email).toLowerCase());
 };
 
@@ -14,33 +14,25 @@ exports.validateEmail = email => {
  */
 exports.checkApiKey = apiKey => {
   if (config.demoMode) return true;
-  if (config.API_KEY == apiKey) return true;
+  if (config.API_KEY === apiKey) return true;
 
   return false;
 };
 
-exports.getFrontendUrl = token => {
-  return `${config.frontendBaseUrl}/?token=${token}`;
-};
+exports.getFrontendUrl = token => `${config.frontendBaseUrl}/?token=${token}`;
 
-exports.getPassportInfoUrl = token => {
-  return `${config.baseUrl}/user/passport/info/${token}`;
-};
+exports.getPassportInfoUrl = token => `${config.baseUrl}/user/passport/info/${token}`;
 
-exports.getStatusInfoUrl = token => {
-  return `${config.baseUrl}/user/info/${token}`;
-};
+exports.getStatusInfoUrl = token => `${config.baseUrl}/user/info/${token}`;
 
-exports.getBaseUrl = () => {
-  return `${config.baseUrl}`;
-};
+exports.getBaseUrl = () => `${config.baseUrl}`;
 
 // Make HTTP Request
 exports.makeHttpRequest = (url, params) => {
   const options = {
-    'method': 'POST',
-    'headers': {
-      'content-type': 'application/x-www-form-urlencoded'
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
     },
     form: qs.stringify(params)
   };
@@ -53,64 +45,64 @@ exports.makeHttpRequest = (url, params) => {
  */
 async function getInfoFromGrid(gfs, filename) {
   return new Promise((resolve, reject) => {
-    gfs.files.findOne({ filename }, function (err, file) {
+    gfs.files.findOne({ filename }, (err, file) => {
       if (err) reject(err);
       else resolve(file);
     });
   });
 }
 
-exports.getImageDataFromGrid = async (gfs, filename) => {
+exports.getImageDataFromGrid = (gfs, filename) => (new Promise(async (resolve, reject) => {
   try {
-    info = await getInfoFromGrid(gfs, filename);
-
-    return new Promise((resolve, reject) => {
-      var rstream = gfs.createReadStream(filename);
-      var bufs = [];
-      rstream.on('data', function (chunk) {
-        bufs.push(chunk);
+    const info = await getInfoFromGrid(gfs, filename);
+    const rstream = gfs.createReadStream(filename);
+    const bufs = [];
+    rstream.on('data', (chunk) => {
+      bufs.push(chunk);
+    })
+      .on('error', () => {
+        reject(new Error('Error'));
       })
-        .on('error', function () {
-          reject(new Error('Error'));
-        })
-        .on('end', function () { // done
-          var fbuf = Buffer.concat(bufs);
-          var File = `${info.metadata};base64,` + (fbuf.toString('base64'));
-          resolve(File);
-        });
-    });
+      .on('end', () => { // done
+        const fbuf = Buffer.concat(bufs);
+        const File = `${info.metadata};base64,${fbuf.toString('base64')}`;
+        resolve(File);
+      });
   } catch (error) {
     reject(error);
   }
-}
+}));
 
-function getImageExt(base64_data) {
+function getImageExt(base64Data) {
   try {
-    var contentType = base64_data.split(";")[0].split(":")[1]
-    if (contentType == "image/jpeg" || contentType == "image/jpg") return 'jpg';
-    else if (contentType == "image/gif") return 'gif';
-    else if (contentType == "image/png") return 'png';
-    else return 'tiff';
+    const contentType = base64Data.split(';')[0].split(':')[1];
+    if (contentType === 'image/jpeg' || contentType === 'image/jpg') return 'jpg';
+    else if (contentType === 'image/gif') return 'gif';
+    else if (contentType === 'image/png') return 'png';
+
+    return 'tiff';
   } catch (error) {
     return undefined;
   }
 }
 exports.getImageExt = getImageExt;
 
-exports.saveImagetoGrid = (gfs, filename, base64_data) => {
-  var metadata
+exports.saveImagetoGrid = (gfs, filename, base64Data) => {
+  let metadata;
   try {
-    metadata = base64_data.split(";")[0];
-  } catch (error) { }
+    metadata = base64Data.split(';')[0];
+  } catch (error) {
+    // console.log(error);
+  }
 
-  var filepath = base64Img.imgSync(base64_data, "./uploads", filename);
+  const filepath = base64Img.imgSync(base64Data, './uploads', filename);
 
-  var writestream = gfs.createWriteStream({ filename, metadata: metadata });
+  const writestream = gfs.createWriteStream({ filename, metadata });
   fs.createReadStream(filepath)
-    .on("end", function () {
-      fs.unlink(filepath, function (err) {
-        if (err) console.log("unlink error: ", err);
+    .on('end', () => {
+      fs.unlink(filepath, (err) => {
+        if (err) console.log('unlink error: ', err); // eslint-disable-line
       });
     })
     .pipe(writestream);
-}
+};
