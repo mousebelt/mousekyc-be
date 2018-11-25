@@ -5,5 +5,5 @@ const config = {
   baseUrl: 'http://localhost:3000',
 
   db: 'mongodb://localhost:27017/kyc-db',
-}
+};
 module.exports = config;

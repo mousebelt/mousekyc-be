@@ -1,10 +1,10 @@
 const socketServer = function (io) {
-	io.on('connection', function (socket) {
+  io.on('connection', (socket) => {
 
-		socket.on('disconnect', function () {
-			console.log("disconnected");
-		});
-	});
+    socket.on('disconnect', () => {
+      console.log('disconnected'); // eslint-disable-line
+    });
+  });
 };
 
 module.exports = socketServer;

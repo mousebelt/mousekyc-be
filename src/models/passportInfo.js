@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
-var Schema = mongoose.Schema;
+const Schema = mongoose.Schema;
 
 // create a schema
-var passportInfoSchema = new Schema(
+const passportInfoSchema = new Schema(
   {
     filename: String,
 
@@ -29,5 +29,5 @@ passportInfoSchema.pre('save', function save(next) {
   next();
 });
 
-const PassportInfo = mongoose.model("PassportInfo", passportInfoSchema);
+const PassportInfo = mongoose.model('PassportInfo', passportInfoSchema);
 module.exports = PassportInfo;

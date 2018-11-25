@@ -1,9 +1,9 @@
 const mongoose = require('mongoose');
 
-var Schema = mongoose.Schema;
+const Schema = mongoose.Schema;
 
 // create a schema
-var userSchema = new Schema(
+const userSchema = new Schema(
   {
     email: { type: String, unique: true },
 
@@ -20,7 +20,7 @@ var userSchema = new Schema(
     documentType: {
       type: String,
       enum: ['PASSPORT', 'IDCARD'],
-      default: "PASSPORT",
+      default: 'PASSPORT',
     },
     identityDocument: String, // photo in blobstore
 
@@ -32,7 +32,7 @@ var userSchema = new Schema(
     approvalStatus: {
       type: String,
       // enum: ['NO_SUBMISSION_YET', PENDING', 'APPROVED', 'ACTION_REQUESTED', 'BLOCKED'],
-      default: "NO_SUBMISSION_YET"
+      default: 'NO_SUBMISSION_YET'
     },
     approvalDescription: String, // ex: "Please submit a clearer selfie, identity is not clear from photo"
 
@@ -54,5 +54,5 @@ userSchema.pre('save', function save(next) {
   next();
 });
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model('User', userSchema);
 module.exports = User;

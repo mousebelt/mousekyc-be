@@ -1,11 +1,11 @@
-const config = require("../config");
+const config = require('../config');
 
 exports.getRenderedTemplate = (templateName, data) => {
   try {
-    const template = require(`../emails/${config.email.template.folder}/${templateName}`);
+    const template = require(`../emails/${config.email.template.folder}/${templateName}`); // eslint-disable-line
     return template.render(data);
   } catch (error) {
-    console.log('getRenderedTemplate error: ', error)
+    console.log('getRenderedTemplate error: ', error); // eslint-disable-line
   }
 
   return '';

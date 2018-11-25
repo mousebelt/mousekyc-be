@@ -1,25 +1,25 @@
-process.env.NODE_ENV = "test";
+process.env.NODE_ENV = 'test';
 
-var chai = require("chai");
-var chaiHttp = require("chai-http");
-var mongoose = require("mongoose");
-var expect = chai.expect;
-var request = require("request");
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+const mongoose = require('mongoose');
+const expect = chai.expect;
+const request = require('request');
 
-var server = require("../src/app");
+const server = require('../src/app');
 
-var should = chai.should();
+const should = chai.should();
 chai.use(chaiHttp);
 
-describe("Global API test", function() {
-  it("should get all countries", function(done) {
+describe('Global API test', () => {
+  it('should get all countries', (done) => {
     chai
       .request(server)
-      .get("/global/countries")
-      .end(function(err, response) {
+      .get('/global/countries')
+      .end((err, response) => {
         response.should.have.status(200);
         response.should.be.json;
-        response.body.should.be.a("object");
+        response.body.should.be.a('object');
         done();
       });
   });

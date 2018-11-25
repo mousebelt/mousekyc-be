@@ -1,8 +1,8 @@
-const mailcomposer = require("mailcomposer");
-const config = require("../config");
+const mailcomposer = require('mailcomposer');
+const config = require('../config');
 
-function send (from, to, subject, text) {
-  const mailgun = require('mailgun-js')({ apiKey: config.email.mailgun.private, domain: config.email.domain });
+function send(from, to, subject, text) {
+  const mailgun = require('mailgun-js')({ apiKey: config.email.mailgun.private, domain: config.email.domain }); // eslint-disable-line
   // const mailOptions = {
   //   from,
   //   to,
@@ -13,7 +13,7 @@ function send (from, to, subject, text) {
   //   console.log(body);
   // });
   return new Promise((resolve, reject) => {
-    let mail = mailcomposer({
+    const mail = mailcomposer({
       from,
       to,
       subject,
@@ -21,7 +21,7 @@ function send (from, to, subject, text) {
     });
 
     mail.build((mailBuildError, message) => {
-      let dataToSend = {
+      const dataToSend = {
         to,
         message: message.toString('ascii')
       };
@@ -35,5 +35,5 @@ function send (from, to, subject, text) {
       });
     });
   });
-};
+}
 exports.send = send;
