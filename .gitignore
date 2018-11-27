@@ -90,9 +90,11 @@ typings/
 .yarn-integrity
 
 # dotenv environment variables file
-.env
-.envrc
-
+# .env
+# .envrc
+/**/config/development.js
+/**/config/production.js
+/**/config/test.js
 
 ### VisualStudioCode ###
 .vscode/*

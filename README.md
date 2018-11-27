@@ -12,6 +12,7 @@ docker build
 [**API Docs**](https://github.com/norestlabs/mousekyc-be/wiki) can be found inside the repo wiki.
 
 ### run project
+
 `docker-compose up`
 
 - test `curl -i http://localhost:3000/global/countries`
