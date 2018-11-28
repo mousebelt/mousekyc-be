@@ -21,7 +21,7 @@ const port = process.env.PORT || config.port;
 const server = require('http').createServer(app);
 
 mongoose
-  .connect(config.db, { useNewUrlParser: true })
+  .connect(config.db /*, { useNewUrlParser: true }*/)
   .then(conn => {
     // GridFS setting
     const gfs = Grid(conn.connection.db);
