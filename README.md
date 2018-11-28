@@ -15,8 +15,8 @@ cp config/test.js.bak config/test.js
 ### Install and Run
 
 - Prerequisites
-1. nodejs install
-2. mongodb install
+nodejs
+mongodb
 
 - run server
 ```
@@ -36,8 +36,8 @@ pm2 restart mousekyc-backend
 
 ### Install and Run using Docker
 - Prerequisites
-1. docker
-1. docker-compose
+docker
+docker-compose
 
 - Installation and Run
 ```
