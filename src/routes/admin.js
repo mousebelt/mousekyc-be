@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-// const passportController = require('../controllers/passport');
 const AdminController = require('../controllers/admin');
+const passportCfg = require('../config/passport'); // eslint-disable-line
 
 // get
 router.get('/submission_list', AdminController.getSubmissionList);

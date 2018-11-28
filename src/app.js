@@ -1,3 +1,4 @@
+require('dotenv').config();
 const fs = require('fs');
 const join = require('path').join;
 const express = require('express');
@@ -7,7 +8,6 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
 const nocache = require('nocache');
-// const http = require('http');
 const passport = require('passport');
 const Grid = require('gridfs-stream');
 Grid.mongo = mongoose.mongo;
@@ -20,15 +20,8 @@ const port = process.env.PORT || config.port;
 // server
 const server = require('http').createServer(app);
 
-// connect mongodb
-// function connect() {
-//   var options = { server: { socketOptions: { keepAlive: 1 } } };
-//   return mongoose.connect(config.db).connection;
-// }
-// connect();
-
 mongoose
-  .connect(config.db /* { server: { socketOptions: { keepAlive: 1 } } } */)
+  .connect(config.db /*, { useNewUrlParser: true }*/)
   .then(conn => {
     // GridFS setting
     const gfs = Grid(conn.connection.db);

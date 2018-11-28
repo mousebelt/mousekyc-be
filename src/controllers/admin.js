@@ -183,7 +183,7 @@ exports.postApproveUser = async (req, res) => {
  */
 exports.getSubmissionList = async (req, res) => {
   const token = req.query.token;
-  const useremail = String(req.query.useremail).toLowerCase();
+  const useremail = req.query.useremail ? String(req.query.useremail).toLowerCase() : null;
   const approvalStatus = req.query.approvalStatus;
   let offset = Number(req.query.offset);
   let count = Number(req.query.count);
@@ -298,12 +298,12 @@ exports.getVerifyOwner = async (req, res) => {
 
     const body = EMailTemplateService.getRenderedTemplate('admin-verified', { email: user.email, project: config.project });
     MailService.send(config.email.masterEmail, user.email, 'Approved your request', body)
-    .then(result => { // eslint-disable-line
-      // console.log(result);
-    })
-    .catch(err => {
-      console.log('mail sending error: ', err);
-    });
+      .then(result => { // eslint-disable-line
+        // console.log(result);
+      })
+      .catch(err => {
+        console.log('mail sending error: ', err);
+      });
 
     return res.json({ status: 200, msg: 'success' });
   } catch (error) {
