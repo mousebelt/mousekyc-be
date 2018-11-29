@@ -26,7 +26,7 @@ npm start
 or
 ```
 npm install
-pm2 start src/app.js -n mousekyc-backend
+pm2 start pm2.json
 ```
 
 - restart server
