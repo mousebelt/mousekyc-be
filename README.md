@@ -12,7 +12,7 @@ git clone https://github.com/norestlabs/mousekyc-be.git
 npm install
 ```
 
-2. Ensure Docker is running and the command:
+2. Ensure Docker is running and execute the command:
 `docker-compose up`
 
 3. Leave the current terminal open, and in new terminal window you can see the processes running with the command:
@@ -23,10 +23,10 @@ npm install
 
 ### Alternative setup
 If you prefer not to use docker or have a port conflict, you should manually install MongoDB.
-1. Once you have downloaded and installed MongoDB from https://www.mongodb.com/download-center/community
+1. Once you have downloaded and installed MongoDB from [https://www.mongodb.com/download-center/community](https://www.mongodb.com/download-center/community)
 2. You will have to create and run an instance in a separate terminal window. See details here
-https://docs.mongodb.com/manual/tutorial/manage-mongodb-processes/
-3. Update the config setting on line 3, file `src/config/default.js` to use the local db `db: 'mongodb://localhost:27017/kyc-db', // this is for local db`
+[https://docs.mongodb.com/manual/tutorial/manage-mongodb-processes/](https://docs.mongodb.com/manual/tutorial/manage-mongodb-processes/)
+3. Update the config setting on line 3, file `src/config/default.js` to use the local db `db: 'mongodb://localhost:27017/kyc-db'`
 
 4. Run mongodb and start the app:
 ```
