@@ -5,8 +5,8 @@ const config = {
   email: {
     domain: 'mail.norestlabs.com',
     mailgun: {
-      public: 'pubkey key',
-      private: 'private key'
+      public: 'insert you public key here',
+      private: 'insert your private key here'
     },
     masterEmail: 'galen@norestlabs.com',
     from: {
@@ -21,6 +21,7 @@ const config = {
   demoMode: false,
   API_KEY: 'apikey-1234567890',
   frontendBaseUrl: 'https://mousekyc.mousebelt.com',
+  // baseUrl: 'http://localhost:3000', // this is for local db
   baseUrl: 'https://mousekyc-server.mousebelt.com',
 };
 
