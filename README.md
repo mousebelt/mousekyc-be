@@ -3,22 +3,22 @@ This is the back end service running on node.js with mongodb, installed with doc
 [Click here to see the project description.](https://github.com/norestlabs/mousekyc)
 
 ## Installation Instructions
-***Prerequisites:*** Please ensure you have Node.js v8 or higher and Docker v18.06.1 or higher installed.
-The docker setup includes mongoDB without additional database installation.
+***Prerequisites:*** Please ensure you have Node.js v8 or higher and Docker v18.06.1 or higher installed. [Mailgun](https://www.mailgun.com/) will be needed for the email messaging service. The docker setup includes mongoDB without additional database installation.
 
 1. Clone the repo and install dependencies:
 ```
 git clone https://github.com/norestlabs/mousekyc-be.git
 npm install
 ```
+2. Modify server configuration in `src/config/default.js`. `db` is to choose the local or docker mongoDB. `email` is for providing your mailgun credentials. `baseUrl` is to choose your localhost server or mousebelt's.
 
-2. Ensure Docker is running and execute the command:
+3. Ensure Docker is running and execute the command:
 `docker-compose up`
 
-3. Leave the current terminal open, and in new terminal window you can see the processes running with the command:
+4. Leave the current terminal open, and in new terminal window you can see the processes running with the command:
 `docker ps -a`
 
-4. Now you can proceed with the [mousekyc-fe](https://github.com/norestlabs/mousekyc/mousekyc-fe) and [mousekyc-admin](https://github.com/norestlabs/mousekyc/mousekyc-admin) repos.
+5. Now you can proceed with the [mousekyc-fe](https://github.com/norestlabs/mousekyc/mousekyc-fe) and [mousekyc-admin](https://github.com/norestlabs/mousekyc/mousekyc-admin) repos.
 
 
 ### Alternative setup
@@ -34,12 +34,12 @@ mongod
 npm start
 ```
 
-### Custom Configuration
-Modify the following files to suit your needs. Backup files end with the .bak extension in the config folder.
+### Configuration
+Copy and rename the backup js files extension in the config folder. Modify the following files to suit your needs.
 ```
-src/config/development.js
-src/config/production.js
-src/config/test.js
+src/config/development.js.bak
+src/config/production.js.bak
+src/config/test.js.bak
 ```
 
 ### Run a test scenario
