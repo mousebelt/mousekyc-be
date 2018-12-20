@@ -22,7 +22,7 @@ passport.use(
   new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
     AdminModel.findOne({ email: email.toLowerCase() }, (err, user) => {
       if (err) return done(err);
-      if (!user) return done(null, false, { msg: 'Invalid email !' });
+      if (!user) return done(null, false, { msg: 'email not found' });
       if (user.status !== ModelConstants.ADMIN_STATUS_VERIFIED) return done(null, false, { msg: 'Not verified user !' });
 
       return user.comparePassword(password, (e, isMatch) => {
@@ -42,7 +42,7 @@ passport.use(
         return done(err);
       }
       if (!user) {
-        return done(null, false, { msg: 'Invalid email !' });
+        return done(null, false, { msg: 'email not found' });
       }
       return user.comparePassword(password, (e, isMatch) => {
         if (e) return done(e);
