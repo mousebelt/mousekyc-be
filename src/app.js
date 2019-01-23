@@ -13,6 +13,7 @@ const Grid = require('gridfs-stream');
 Grid.mongo = mongoose.mongo;
 
 const config = require('./config');
+const dbInitialize = require('./services/dbInitialize');
 // config
 app.set('config', config);
 const port = process.env.PORT || config.port;
@@ -59,6 +60,7 @@ const io = require('socket.io')(server);
 require('./services/socket.service')(io);
 // cron for updating db
 require('./services/cron.service').start();
+dbInitialize();
 
 // initialize image folder for uploading
 (function () { // eslint-disable-line

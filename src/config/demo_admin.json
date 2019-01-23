@@ -1,0 +1,7 @@
+{
+  "email": "demo_admin@mail.com",
+  "password": "demo",
+  "firstname": "Demo",
+  "lastname": "Admin",
+  "status": "verified"
+}
