@@ -8,8 +8,8 @@ const demoAdminCreate = () => {
       if (row) return;
 
       new adminModel(demoAdminInfo).save()
-        .then(result => {
-          console.log('demo admin created.', result);
+        .then(result => { // eslint-disable-line
+          console.log('demo admin created.');
         })
         .catch(err => {
           console.log('error in saving demo admin.', err);
