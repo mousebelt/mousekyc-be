@@ -1,8 +1,7 @@
 const config = {
   port: 3000,
 
-  // db: 'mongodb://localhost:27017/kyc-db', // this is for local db
-  db: 'mongodb://mongo:27017/kyc-db', // this is for docker db
+  db: process.env.DATABASE_URI || 'mongodb://localhost:27017/kyc-db',
 
   email: {
     domain: 'mail.norestlabs.com',
