@@ -16,24 +16,24 @@ exports.makeAdminLoginToken = (payload, options) => (jwt.sign({ _id: payload, ty
 
 exports.getAdminFromToken = async (tokenRaw) => {
   try {
-    if (String(tokenRaw) === '') throw new Error('empty token !');
+    if(String(tokenRaw) === '') throw new Error('empty token !');
     const decoded = (jwt.verify(String(tokenRaw), 'secret'));
     const { _id } = JSON.parse(JSON.stringify(decoded));
     const admin = await AdminModel.findById(_id);
     return admin;
-  } catch (e) {
+  } catch(e) {
     return undefined;
   }
 };
 
 exports.getUserFromToken = async (tokenRaw) => {
   try {
-    if (String(tokenRaw) === '') throw new Error('empty token !');
+    if(String(tokenRaw) === '') throw new Error('empty token !');
     const decoded = (jwt.verify(String(tokenRaw), 'secret'));
     const { _id } = JSON.parse(JSON.stringify(decoded));
     const user = await UserModel.findById(_id);
     return user;
-  } catch (e) {
+  } catch(e) {
     return undefined;
   }
 };
