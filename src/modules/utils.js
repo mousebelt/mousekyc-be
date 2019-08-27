@@ -4,7 +4,7 @@ const request = require('request');
 const qs = require('querystring');
 const config = require('../config');
 
-exports.validateEmail = email => {
+exports.validateEmail = (email) => {
   const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/; // eslint-disable-line
   return re.test(String(email).toLowerCase());
 };
@@ -12,9 +12,9 @@ exports.validateEmail = email => {
 /**
  * third-party integration utils
  */
-exports.checkApiKey = apiKey => {
-  if (config.demoMode) return true;
-  if (config.API_KEY === apiKey) return true;
+exports.checkApiKey = (apiKey) => {
+  if(config.demoMode) return true;
+  if(config.API_KEY === apiKey) return true;
 
   return false;
 };
@@ -46,7 +46,7 @@ exports.makeHttpRequest = (url, params) => {
 async function getInfoFromGrid(gfs, filename) {
   return new Promise((resolve, reject) => {
     gfs.files.findOne({ filename }, (err, file) => {
-      if (err) reject(err);
+      if(err) reject(err);
       else resolve(file);
     });
   });
@@ -68,7 +68,7 @@ exports.getImageDataFromGrid = (gfs, filename) => (new Promise(async (resolve, r
         const File = `${info.metadata};base64,${fbuf.toString('base64')}`;
         resolve(File);
       });
-  } catch (error) {
+  } catch(error) {
     reject(error);
   }
 }));
@@ -76,12 +76,12 @@ exports.getImageDataFromGrid = (gfs, filename) => (new Promise(async (resolve, r
 function getImageExt(base64Data) {
   try {
     const contentType = base64Data.split(';')[0].split(':')[1];
-    if (contentType === 'image/jpeg' || contentType === 'image/jpg') return 'jpg';
-    else if (contentType === 'image/gif') return 'gif';
-    else if (contentType === 'image/png') return 'png';
+    if(contentType === 'image/jpeg' || contentType === 'image/jpg') return 'jpg';
+    if(contentType === 'image/gif') return 'gif';
+    if(contentType === 'image/png') return 'png';
 
     return 'tiff';
-  } catch (error) {
+  } catch(error) {
     return undefined;
   }
 }
@@ -90,8 +90,8 @@ exports.getImageExt = getImageExt;
 exports.saveImagetoGrid = (gfs, filename, base64Data) => {
   let metadata;
   try {
-    metadata = base64Data.split(';')[0];
-  } catch (error) {
+    metadata = base64Data.split(';')[0]; // eslint-disable-line
+  } catch(error) {
     // console.log(error);
   }
 

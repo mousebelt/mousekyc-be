@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt-nodejs');
 const mongoose = require('mongoose');
 const constants = require('./constants');
 
-const Schema = mongoose.Schema;
+const { Schema } = mongoose;
 
 // create a schema
 const adminSchema = new Schema({
@@ -37,11 +37,11 @@ const adminSchema = new Schema({
 adminSchema.pre('save', function save(next) {
   const user = this;
   user.updatedAt = Date.now();
-  if (!user.isModified('password')) { return next(); }
+  if(!user.isModified('password')) { return next(); }
   return bcrypt.genSalt(10, (err, salt) => {
-    if (err) { return next(err); }
+    if(err) { return next(err); }
     return bcrypt.hash(user.password, salt, null, (e, hash) => {
-      if (e) { return next(e); }
+      if(e) { return next(e); }
       user.password = hash;
       return next();
     });

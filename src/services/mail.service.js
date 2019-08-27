@@ -11,7 +11,7 @@ function send(from, to, subject, text) {
       html: text
     };
     mailgun.messages().send(mail, (err, body) => {
-      if (err) {
+      if(err) {
         console.log(err);
         reject(new Error(err));
       }

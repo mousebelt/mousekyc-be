@@ -1,8 +1,10 @@
 require('dotenv').config();
 const fs = require('fs');
-const join = require('path').join;
+const { join } = require('path');
+const http = require('http');
 const express = require('express');
 const mongoose = require('mongoose');
+
 const app = express();
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
@@ -10,6 +12,7 @@ const fileUpload = require('express-fileupload');
 const nocache = require('nocache');
 const passport = require('passport');
 const Grid = require('gridfs-stream');
+
 Grid.mongo = mongoose.mongo;
 
 const config = require('./config');
@@ -19,16 +22,16 @@ app.set('config', config);
 const port = process.env.PORT || config.port;
 
 // server
-const server = require('http').createServer(app);
+const server = http.createServer(app);
 
 mongoose
   .connect(config.db, { useNewUrlParser: true })
-  .then(conn => {
+  .then((conn) => {
     // GridFS setting
     const gfs = Grid(conn.connection.db);
     app.set('gfs', gfs);
   })
-  .catch(err => {
+  .catch((err) => {
     console.log('DB error occured !', err); // eslint-disable-line
   });
 
@@ -36,11 +39,12 @@ mongoose
 const models = join(__dirname, './models');
 // Bootstrap models
 fs.readdirSync(models)
-  .filter(file => ~file.search(/^[^\.].*\.js$/))
+  .filter(file => ~file.search(/^[^\.].*\.js$/)) // eslint-disable-line
   .forEach(file => require(join(models, file))); // eslint-disable-line
 
 // Routing
 app.use(require('cors')());
+
 app.use(cookieParser());
 app.use(bodyParser.json({ limit: '50mb' })); // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
@@ -53,13 +57,15 @@ app.use(passport.session());
 
 // routing
 const Router = require('./routes/app');
+
 app.use('/', Router);
 
 // io server
-const io = require('socket.io')(server);
+const io = require('socket.io')(server); // eslint-disable-line
 require('./services/socket.service')(io);
 // cron for updating db
 require('./services/cron.service').start();
+
 dbInitialize();
 
 // initialize image folder for uploading
@@ -67,8 +73,8 @@ dbInitialize();
   try {
     fs.mkdirSync('./uploads/');
     console.log('Created folder, /uploads'); // eslint-disable-line
-  } catch (err) {
-    if (err.code !== 'EEXIST') throw err;
+  } catch(err) {
+    if(err.code !== 'EEXIST') throw err;
   }
 })();
 
